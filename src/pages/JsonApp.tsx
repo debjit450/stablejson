@@ -260,68 +260,12 @@ export default function Index() {
     <Layout showCommandButton onOpenCommand={() => setCommandOpen(true)}>
       <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary">
 
-        {/* Hero Section - Only show when no input */}
-        {!input && (
-          <section className="relative border-b border-border/40 overflow-hidden">
-            {/* Technical background grid */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-            <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background"></div>
-
-            <div className="relative container mx-auto px-4 py-24 max-w-5xl text-center">
-              <div className="animate-in fade-in zoom-in duration-700">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-mono font-medium mb-8">
-                  <Terminal className="w-3 h-3" />
-                  <span>v2.0 // DEPLOYED</span>
-                </div>
-
-                <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 text-transparent bg-clip-text bg-gradient-to-br from-foreground to-foreground/60">
-                  Work with JSON,
-                  <br />
-                  <span className="font-light italic text-muted-foreground">without the noise.</span>
-                </h1>
-
-                <p className="text-xl text-muted-foreground/80 max-w-2xl mx-auto mb-10 leading-relaxed font-light">
-                  A fast, private utility for cleaning, formatting, diffing, and inspecting JSON —
-                  running entirely in your browser.
-                </p>
-
-                <div className="flex flex-wrap items-center justify-center gap-6 text-sm font-mono text-muted-foreground mb-16 opacity-70">
-                  <span className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                    No accounts
-                  </span>
-                  <span className="text-border">/</span>
-                  <span className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                    No tracking
-                  </span>
-                  <span className="text-border">/</span>
-                  <span className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                    Local execution
-                  </span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 max-w-4xl mx-auto animate-in slide-in-from-bottom-8 duration-700 delay-200">
-                {features.map(({ icon: Icon, text }, index) => (
-                  <div key={text} className="group relative flex flex-col items-center gap-3 p-4 rounded-xl border border-border/40 bg-card/5 hover:bg-card/20 hover:border-primary/30 transition-all duration-300">
-                    <div className="p-2.5 rounded-lg bg-background border border-border/50 group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                      <Icon className="w-5 h-5 text-primary/80 group-hover:text-primary" />
-                    </div>
-                    <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground text-center">{text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+     
 
         {/* Toolbar - Sticky & Glassmorphic */}
         <div className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
           <div className="container mx-auto px-4 py-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
-
               {/* Operations Group */}
               <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/40 border border-border/20 overflow-x-auto scrollbar-none">
                 <Button variant="ghost" size="sm" onClick={handleFormat} disabled={!validation.valid} className="h-8 gap-2 hover:bg-background hover:shadow-sm font-medium text-xs">
