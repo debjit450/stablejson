@@ -525,22 +525,6 @@ export default function Index() {
           </div>
         </div>
 
-        {/* Footer / Philosophy */}
-        {!input && (
-          <div className="border-t border-border/40 bg-muted/10 py-12">
-            <div className="container mx-auto px-4 text-center">
-              <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-gradient-to-br from-background to-muted border border-border/50 shadow-inner mb-6">
-                <Sparkles className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="text-lg font-medium text-foreground mb-3 font-display">Simple tools last longer</h3>
-              <p className="text-muted-foreground/70 max-w-md mx-auto text-sm leading-relaxed">
-                This tool is intentionally simple. It does one thing well, avoids unnecessary
-                features, and respects your data by keeping everything on your device.
-              </p>
-            </div>
-          </div>
-        )}
-
         <CommandPalette commands={commands} open={commandOpen} onOpenChange={setCommandOpen} />
       </div>
     </Layout>
