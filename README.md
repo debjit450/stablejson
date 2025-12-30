@@ -1,7 +1,6 @@
 # StableJSON
 
 <div align="center">
-  <img src="public/favicon.ico" alt="StableJSON Logo" width="80" height="80">
   <h3>Clean, compare, and understand JSON — entirely in your browser.</h3>
   <p>A fast, private, frontend-only utility for cleaning, formatting, diffing, and inspecting JSON.</p>
   
