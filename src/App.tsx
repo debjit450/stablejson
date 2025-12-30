@@ -9,6 +9,7 @@ import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import OpenSource from "./pages/OpenSource";
 import Contributing from "./pages/Contributing";
+import ReleaseNotes from "./pages/ReleaseNotes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/open-source" element={<OpenSource />} />
           <Route path="/contributing" element={<Contributing />} />
+          <Route path="/release-notes" element={<ReleaseNotes />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

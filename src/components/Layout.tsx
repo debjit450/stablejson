@@ -33,6 +33,7 @@ export function Layout({ children, onOpenCommand, showCommandButton = false }: L
               <NavLink to="/privacy">Privacy</NavLink>
               <NavLink to="/open-source">Philosophy</NavLink>
               <NavLink to="/contributing">Contributing</NavLink>
+              <NavLink to="/release-notes">Release Notes</NavLink>
             </div>
             
             <div className="flex items-center gap-2 ml-4">
@@ -68,6 +69,7 @@ export function Layout({ children, onOpenCommand, showCommandButton = false }: L
           <NavLink to="/privacy">Privacy</NavLink>
           <NavLink to="/open-source">Philosophy</NavLink>
           <NavLink to="/contributing">Contributing</NavLink>
+          <NavLink to="/release-notes">Release Notes</NavLink>
         </nav>
       </header>
 
@@ -85,6 +87,7 @@ export function Layout({ children, onOpenCommand, showCommandButton = false }: L
               <Link to="/privacy" className="hover:text-foreground transition-colors font-body">Privacy</Link>
               <Link to="/open-source" className="hover:text-foreground transition-colors font-body">Philosophy</Link>
               <Link to="/contributing" className="hover:text-foreground transition-colors font-body">Contributing</Link>
+              <Link to="/release-notes" className="hover:text-foreground transition-colors font-body">Release Notes</Link>
             </div>
           </div>
         </div>
