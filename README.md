@@ -325,10 +325,9 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 - **GitHub Discussions** — For questions and community chat
 - **Documentation** — Comprehensive guides and examples
 
-### Professional Support
-For enterprise support, custom features, or consulting:
-- 📧 **Email:** support@stablejson.com
-- 💼 **Enterprise:** enterprise@stablejson.com
+### Contact
+For questions, suggestions, or support:
+- 📧 **Email:** debjitdey450@gmail.com
 
 ---
 
