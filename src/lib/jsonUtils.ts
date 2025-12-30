@@ -382,7 +382,7 @@ export function highlightJson(json: string, searchTerm?: string): string {
     .replace(/: (-?\d+\.?\d*)/g, ': <span class="syntax-number">$1</span>')
     .replace(/: (true|false)/g, ': <span class="syntax-boolean">$1</span>')
     .replace(/: (null)/g, ': <span class="syntax-null">$1</span>')
-    .replace(/([{}\[\]])/g, '<span class="syntax-bracket">$1</span>');
+    .replace(/([{}\\[\]])/g, '<span class="syntax-bracket">$1</span>');
 
   if (searchTerm && searchTerm.trim()) {
     const escaped = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
