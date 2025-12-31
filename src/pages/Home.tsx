@@ -162,32 +162,40 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {features.map(({ icon: Icon, text, description }, index) => (
-              <div
-                key={text}
-                className="relative p-4 sm:p-6 rounded-2xl bg-foreground/5 border border-border hover:bg-foreground/10 transition-colors duration-300 cursor-pointer"
-              >
-                <div className="flex items-start gap-3 sm:gap-4">
-                  {/* Icon */}
-                  <div className="shrink-0 p-2 sm:p-3 rounded-xl bg-foreground/10 border border-border">
-                    <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
-                  </div>
+            {features.map(({ icon: Icon, text, description }, index) => {
+              const cardClasses = [
+                "relative p-4 sm:p-6 rounded-2xl bg-foreground/5 border border-border hover:bg-foreground/10 transition-colors duration-300 cursor-pointer",
+                index % 3 === 0 ? "card-brand" : "",
+                index % 3 === 1 ? "card-info" : "",
+                index % 3 === 2 ? "card-accent-secondary" : "",
+              ].filter(Boolean).join(" ");
 
-                  <div className="pt-1 flex-1">
-                    <h3 className="font-display font-semibold text-sm sm:text-base text-foreground mb-2 tracking-tight">
-                      {text}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-light">
-                      {description}
-                    </p>
+              return (
+                <div
+                  key={text}
+                  className={cardClasses}
+                >
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    {/* Icon */}
+                    <div className="shrink-0 p-2 sm:p-3 rounded-xl bg-foreground/10 border border-border">
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
+                    </div>
+
+                    <div className="pt-1 flex-1">
+                      <h3 className="font-display font-semibold text-sm sm:text-base text-foreground mb-2 tracking-tight">
+                        {text}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-light">
+                        {description}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </div>
+          </div>
       </section>
-
       {/* Philosophy Section */}
       <section className="py-16 sm:py-20 lg:py-28 relative">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[2px] bg-gradient-to-r from-transparent via-border to-transparent" />

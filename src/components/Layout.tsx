@@ -21,8 +21,8 @@ export function Layout({ children, onOpenCommand, showCommandButton = false }: L
       <header className="border-b border-border/50 sticky top-0 z-10 glass-effect">
         <div className="container mx-auto px-4 h-14 sm:h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-all duration-200 group">
-            <div className="p-1 sm:p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-              <Braces className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+            <div className="p-1 sm:p-1.5 rounded-lg bg-[hsl(var(--brand)/0.1)] group-hover:bg-[hsl(var(--brand)/0.2)] transition-colors">
+              <Braces className="w-4 h-4 sm:w-5 sm:h-5 text-[hsl(var(--brand))]" />
             </div>
             <span className="text-base sm:text-lg font-display text-foreground tracking-tight">StableJSON</span>
           </Link>
@@ -44,7 +44,7 @@ export function Layout({ children, onOpenCommand, showCommandButton = false }: L
                   variant="ghost"
                   size="sm"
                   onClick={onOpenCommand}
-                  className="hidden lg:flex h-8 sm:h-9 gap-2 text-xs text-muted-foreground hover:text-foreground font-code"
+                  className="hidden lg:flex h-8 sm:h-9 gap-2 text-xs text-muted-foreground hover:text-[hsl(var(--accent-secondary))] font-code"
                 >
                   <Command className="w-3 h-3 sm:w-4 sm:h-4" />
                   <kbd className="text-[10px] px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-md border border-border bg-muted/50 font-code">⌘K</kbd>
@@ -91,10 +91,10 @@ export function Layout({ children, onOpenCommand, showCommandButton = false }: L
               </div>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-              <Link to="/privacy" className="hover:text-foreground transition-colors font-body">Privacy</Link>
-              <Link to="/open-source" className="hover:text-foreground transition-colors font-body">Philosophy</Link>
-              <Link to="/contributing" className="hover:text-foreground transition-colors font-body">Contributing</Link>
-              <Link to="/release-notes" className="hover:text-foreground transition-colors font-body">Release Notes</Link>
+              <Link to="/privacy" className="hover:text-[hsl(var(--info))] transition-colors font-body">Privacy</Link>
+              <Link to="/open-source" className="hover:text-[hsl(var(--brand))] transition-colors font-body">Philosophy</Link>
+              <Link to="/contributing" className="hover:text-[hsl(var(--accent-secondary))] transition-colors font-body">Contributing</Link>
+              <Link to="/release-notes" className="hover:text-[hsl(var(--success))] transition-colors font-body">Release Notes</Link>
             </div>
           </div>
         </div>

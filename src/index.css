@@ -37,6 +37,15 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 9%;
 
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 98%;
+
+    --brand: 262 83% 58%;
+    --brand-foreground: 0 0% 98%;
+
+    --accent-secondary: 320 70% 50%;
+    --accent-secondary-foreground: 0 0% 98%;
+
     --border: 0 0% 92%;
     --input: 0 0% 92%;
     --ring: 0 0% 9%;
@@ -96,6 +105,15 @@
 
     --warning: 38 85% 60%;
     --warning-foreground: 0 0% 9%;
+
+    --info: 199 85% 60%;
+    --info-foreground: 0 0% 98%;
+
+    --brand: 262 80% 65%;
+    --brand-foreground: 0 0% 98%;
+
+    --accent-secondary: 320 65% 60%;
+    --accent-secondary-foreground: 0 0% 98%;
 
     --border: 0 0% 15%;
     --input: 0 0% 15%;
@@ -186,6 +204,18 @@
     background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.98) 100%);
     backdrop-filter: blur(8px);
     transition: colors 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-brand {
+    @apply border-[hsl(var(--brand)/0.3)] bg-gradient-to-br from-[hsl(var(--brand)/0.05)] to-[hsl(var(--brand)/0.02)];
+  }
+
+  .card-info {
+    @apply border-[hsl(var(--info)/0.3)] bg-gradient-to-br from-[hsl(var(--info)/0.05)] to-[hsl(var(--info)/0.02)];
+  }
+
+  .card-accent-secondary {
+    @apply border-[hsl(var(--accent-secondary)/0.3)] bg-gradient-to-br from-[hsl(var(--accent-secondary)/0.05)] to-[hsl(var(--accent-secondary)/0.02)];
   }
 
   .premium-button {

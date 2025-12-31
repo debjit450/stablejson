@@ -260,7 +260,7 @@ export default function Index() {
     <Layout showCommandButton onOpenCommand={() => setCommandOpen(true)}>
       <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary">
 
-     
+
 
         {/* Toolbar - Sticky & Glassmorphic */}
         <div className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
@@ -339,7 +339,7 @@ export default function Index() {
                 </Button>
 
                 <div className="flex items-center rounded-md border border-border/40 bg-background/50">
-                  <Button variant="ghost" size="sm" onClick={handleLoadSample} className="h-7 sm:h-8 px-2 sm:px-3 text-muted-foreground hover:text-foreground text-xs font-medium">
+                  <Button variant="info" size="sm" onClick={handleLoadSample} className="h-7 sm:h-8 px-2 sm:px-3 text-xs font-medium">
                     <FileJson className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-2" /> <span className="hidden sm:inline">Sample</span>
                   </Button>
                   <div className="w-px h-4 bg-border/40" />
@@ -349,9 +349,10 @@ export default function Index() {
                 </div>
 
                 <Button
+                  variant="brand"
                   onClick={handleCopy}
                   disabled={!output && viewMode === "formatted"}
-                  className="h-7 sm:h-8 px-2 sm:px-4 bg-foreground text-background hover:bg-foreground/90 text-xs font-bold shadow-lg"
+                  className="h-7 sm:h-8 px-2 sm:px-4 text-xs font-bold shadow-lg"
                 >
                   <Copy className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-2" /> Copy
                 </Button>
