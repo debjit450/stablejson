@@ -43,7 +43,7 @@ export function JsonQuery({ json }: JsonQueryProps) {
           className="font-mono text-sm"
           onKeyDown={(e) => e.key === "Enter" && handleQuery()}
         />
-        <Button onClick={handleQuery} size="sm" variant="premium">
+        <Button onClick={handleQuery} size="sm" variant="default">
           <Search className="w-4 h-4" />
           Query
         </Button>

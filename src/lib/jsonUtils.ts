@@ -675,8 +675,6 @@ export function searchJson(input: string, term: string): SearchMatch[] {
   return matches;
 }
 
-// Advanced JSON utilities
-
 // JSON Path query (JSONPath-like syntax)
 export function queryJsonPath(input: string, query: string): unknown[] {
   const result = validateJson(input);
@@ -686,9 +684,37 @@ export function queryJsonPath(input: string, query: string): unknown[] {
   
   const results: unknown[] = [];
   
+  function evaluateFilter(item: unknown, filter: string): boolean {
+    try {
+      const expression = filter.replace(/@/g, 'item');
+      const func = new Function('item', `return ${expression}`);
+      return func(item);
+    } catch {
+      return false;
+    }
+  }
+  
   function traverse(obj: unknown, path: string[] = []) {
     if (query === "$" && path.length === 0) {
       results.push(obj);
+      return;
+    }
+    
+    if (query.includes('[?(@')) {
+      const filterMatch = query.match(/\[\?\(([^)]+)\)\]/);
+      if (filterMatch && Array.isArray(obj)) {
+        const filterExpr = filterMatch[1];
+        obj.forEach(item => {
+          if (evaluateFilter(item, filterExpr)) {
+            results.push(item);
+          }
+        });
+      }
+      return;
+    }
+    
+    if (query.includes('[*]') && Array.isArray(obj)) {
+      obj.forEach(item => results.push(item));
       return;
     }
     
@@ -712,7 +738,21 @@ export function queryJsonPath(input: string, query: string): unknown[] {
       let current = obj;
       for (const part of parts) {
         if (current === null || typeof current !== "object") break;
-        if (Array.isArray(current)) {
+        
+        if (part.includes('[') && part.includes(']')) {
+          const [key, bracket] = part.split('[');
+          const index = parseInt(bracket.replace(']', ''), 10);
+          
+          if (key) {
+            current = (current as Record<string, unknown>)[key];
+          }
+          
+          if (Array.isArray(current) && !isNaN(index) && index >= 0 && index < current.length) {
+            current = current[index];
+          } else {
+            break;
+          }
+        } else if (Array.isArray(current)) {
           const index = parseInt(part, 10);
           if (!isNaN(index) && index >= 0 && index < current.length) {
             current = current[index];

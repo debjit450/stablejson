@@ -85,7 +85,7 @@ export function JsonTransformer({ json, secondJson, onResult }: JsonTransformerP
                 placeholder='{"oldKey": "newKey"}'
               />
             </div>
-            <Button onClick={handleTransform} className="w-full" variant="premium">
+            <Button onClick={handleTransform} className="w-full" variant="default">
               <Shuffle className="w-4 h-4" />
               Transform Keys
             </Button>
@@ -112,7 +112,7 @@ export function JsonTransformer({ json, secondJson, onResult }: JsonTransformerP
                 type="number"
               />
             </div>
-            <Button onClick={handleFlatten} className="w-full" variant="premium">
+            <Button onClick={handleFlatten} className="w-full" variant="default">
               <Layers2 className="w-4 h-4" />
               Flatten JSON
             </Button>
@@ -127,7 +127,7 @@ export function JsonTransformer({ json, secondJson, onResult }: JsonTransformerP
             <Button 
               onClick={handleMerge} 
               className="w-full" 
-              variant="premium"
+              variant="default"
               disabled={!secondJson}
             >
               <Merge className="w-4 h-4" />
@@ -138,7 +138,7 @@ export function JsonTransformer({ json, secondJson, onResult }: JsonTransformerP
         
         <TabsContent value="export" className="flex-1 p-4">
           <div className="space-y-4">
-            <Button onClick={handleToCsv} className="w-full" variant="premium">
+            <Button onClick={handleToCsv} className="w-full" variant="default">
               <FileSpreadsheet className="w-4 h-4" />
               Copy as CSV
             </Button>

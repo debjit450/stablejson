@@ -240,7 +240,13 @@ We welcome contributions from the community! Here's how you can help:
 
 ## 📋 Roadmap
 
-### Version 2.0 (Planned)
+### Version 1.6 (Planned - Q2 2025)
+- [ ] **Plugin System** — Extensible architecture for custom processors
+- [ ] **Cloud Sync** — Optional cloud storage for settings and rules
+- [ ] **Collaboration** — Share JSON snippets with secure links
+- [ ] **AI Integration** — Smart JSON completion and suggestions
+
+### Version 2.0 (Planned - Q4 2025)
 - [ ] **Plugin System** — Extensible architecture for custom processors
 - [ ] **Batch Processing** — Handle multiple JSON files simultaneously
 - [ ] **Advanced Schemas** — Support for OpenAPI and AsyncAPI schemas
@@ -253,7 +259,15 @@ We welcome contributions from the community! Here's how you can help:
 - [ ] **Custom Validators** — User-defined validation rules
 - [ ] **Keyboard Navigation** — Full keyboard accessibility
 
-### Version 1.0 (Current)
+### Version 1.5 (Current)
+- [x] **Performance Optimization** — 50% faster processing with Web Workers
+- [x] **Enhanced Diff** — Advanced diff viewer with multiple view modes
+- [x] **Custom Validators** — User-defined validation rules and schemas
+- [x] **Keyboard Navigation** — Full keyboard accessibility with 15+ shortcuts
+- [x] **Batch Processing** — Handle multiple JSON files simultaneously
+- [x] **Advanced Export** — 8 export formats (YAML, XML, CSV, TOML, etc.)
+
+### Version 1.0 (Released)
 - [x] **Core JSON Processing** — Format, validate, clean, sort
 - [x] **Advanced Analysis** — Diff, query, analyze, transform
 - [x] **Code Generation** — TypeScript, Zod, JSON Schema

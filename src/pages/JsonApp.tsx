@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { JsonEditor } from "@/components/JsonEditor";
 import { DiffViewer } from "@/components/DiffViewer";
+import { EnhancedDiffViewer } from "@/components/EnhancedDiffViewer";
 import { TableViewer } from "@/components/TableViewer";
 import { TypesViewer } from "@/components/TypesViewer";
 import { FoldableJsonViewer } from "@/components/FoldableJsonViewer";
@@ -9,11 +10,16 @@ import { JsonQuery } from "@/components/JsonQuery";
 import { JsonAnalyzer } from "@/components/JsonAnalyzer";
 import { JsonTransformer } from "@/components/JsonTransformer";
 import { JsonValidator } from "@/components/JsonValidator";
+import { CustomValidator } from "@/components/CustomValidator";
+import { BatchProcessor } from "@/components/BatchProcessor";
+import { AdvancedExporter } from "@/components/AdvancedExporter";
 import { CommandPalette, createCommands } from "@/components/CommandPalette";
 import { Layout } from "@/components/Layout";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useTheme } from "@/hooks/useTheme";
+import { useKeyboardNavigation, DEFAULT_JSON_SHORTCUTS } from "@/lib/keyboardNavigation";
+import { PerformanceMonitor, MemoryEfficientJson, debounce } from "@/lib/performance";
 import {
   validateJson,
   formatJson,
@@ -55,9 +61,25 @@ import {
   Zap,
   Cpu,
   Terminal,
+  Layers2,
+  Package,
+  FileOutput,
+  ChevronDown,
 } from "lucide-react";
 
-type ViewMode = "formatted" | "diff" | "table" | "types" | "foldable" | "query" | "analyze" | "transform" | "validate";
+type ViewMode =
+  | "formatted"
+  | "diff"
+  | "table"
+  | "types"
+  | "foldable"
+  | "query"
+  | "analyze"
+  | "transform"
+  | "validate"
+  | "batch"
+  | "export"
+  | "enhanced-diff";
 
 export default function Index() {
   const [input, setInput] = useLocalStorage("stablejson-input", "");
@@ -65,13 +87,15 @@ export default function Index() {
   const [output, setOutput] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("formatted");
   const [diffResults, setDiffResults] = useState<DiffResult[]>([]);
-  const [tableData, setTableData] = useState<{ headers: string[]; rows: Record<string, unknown>[] } | null>(null);
+  const [tableData, setTableData] = useState<{ headers: string[]; rows: Record<string, any>[] } | null>(null);
   const [typescriptOutput, setTypescriptOutput] = useState("");
   const [zodOutput, setZodOutput] = useState("");
   const [schemaOutput, setSchemaOutput] = useState("");
   const [canonicalMode, setCanonicalMode] = useLocalStorage("stablejson-canonical", false);
   const [structuralDiff, setStructuralDiff] = useLocalStorage("stablejson-structural-diff", false);
   const [commandOpen, setCommandOpen] = useState(false);
+  const [performanceMode, setPerformanceMode] = useLocalStorage("stablejson-performance", false);
+  const [processingStats, setProcessingStats] = useState<any>(null);
   const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
 
@@ -87,27 +111,102 @@ export default function Index() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const handleFormat = useCallback(() => {
+  // Setup keyboard navigation
+  const shortcuts = DEFAULT_JSON_SHORTCUTS.map((shortcut) => ({
+    ...shortcut,
+    action: () => {
+      switch (shortcut.key) {
+        case "f":
+          if (shortcut.ctrlKey) handleFormat();
+          break;
+        case "m":
+          if (shortcut.ctrlKey) handleMinify();
+          break;
+        case "s":
+          if (shortcut.ctrlKey) handleSort();
+          break;
+        case "c":
+          if (shortcut.ctrlKey && shortcut.shiftKey) handleClean();
+          break;
+        case "d":
+          if (shortcut.ctrlKey) handleDiff();
+          break;
+        case "t":
+          if (shortcut.ctrlKey) handleTable();
+          break;
+        case "g":
+          if (shortcut.ctrlKey) handleTypes();
+          break;
+        case "k":
+          if (shortcut.ctrlKey) setCommandOpen(true);
+          break;
+        case "/":
+          if (shortcut.ctrlKey) showShortcutsHelp();
+          break;
+        case "r":
+          if (shortcut.ctrlKey) handleClear();
+          break;
+        case "l":
+          if (shortcut.ctrlKey) handleLoadSample();
+          break;
+      }
+    },
+  }));
+
+  const { showShortcutsHelp } = useKeyboardNavigation({
+    shortcuts,
+    enableGlobalShortcuts: true,
+    enableArrowNavigation: true,
+    enableTabNavigation: true,
+    enableEscapeHandling: true,
+  });
+
+  const handleFormat = useCallback(async () => {
+    const timer = PerformanceMonitor.startTimer("format");
     try {
-      const formatted = canonicalMode ? canonicalJson(input) : formatJson(input);
+      let formatted: string;
+      if (performanceMode && input.length > 100000) {
+        formatted = await MemoryEfficientJson.processLargeJson(input, "format");
+      } else {
+        formatted = canonicalMode ? canonicalJson(input) : formatJson(input);
+      }
       setOutput(formatted);
       setViewMode("formatted");
-      toast({ description: canonicalMode ? "JSON canonicalized" : "JSON formatted" });
+      const duration = timer();
+      setProcessingStats(PerformanceMonitor.getMetrics("format"));
+      toast({
+        description: `${canonicalMode ? "JSON canonicalized" : "JSON formatted"} (${duration.toFixed(2)}ms)`,
+      });
     } catch (e) {
-      toast({ variant: "destructive", description: e instanceof Error ? e.message : "Failed to format" });
+      timer();
+      toast({
+        variant: "destructive",
+        description: e instanceof Error ? e.message : "Failed to format",
+      });
     }
-  }, [input, canonicalMode, toast]);
+  }, [input, canonicalMode, performanceMode, toast]);
 
-  const handleMinify = useCallback(() => {
+  const handleMinify = useCallback(async () => {
+    const timer = PerformanceMonitor.startTimer("minify");
     try {
-      const minified = minifyJson(input);
+      let minified: string;
+      if (performanceMode && input.length > 100000) {
+        minified = await MemoryEfficientJson.processLargeJson(input, "minify");
+      } else {
+        minified = minifyJson(input);
+      }
       setOutput(minified);
       setViewMode("formatted");
-      toast({ description: "JSON minified" });
+      const duration = timer();
+      toast({ description: `JSON minified (${duration.toFixed(2)}ms)` });
     } catch (e) {
-      toast({ variant: "destructive", description: e instanceof Error ? e.message : "Failed to minify" });
+      timer();
+      toast({
+        variant: "destructive",
+        description: e instanceof Error ? e.message : "Failed to minify",
+      });
     }
-  }, [input, toast]);
+  }, [input, performanceMode, toast]);
 
   const handleSort = useCallback(() => {
     try {
@@ -116,7 +215,10 @@ export default function Index() {
       setViewMode("formatted");
       toast({ description: "Keys sorted" });
     } catch (e) {
-      toast({ variant: "destructive", description: e instanceof Error ? e.message : "Failed to sort" });
+      toast({
+        variant: "destructive",
+        description: e instanceof Error ? e.message : "Failed to sort",
+      });
     }
   }, [input, toast]);
 
@@ -127,7 +229,10 @@ export default function Index() {
       setViewMode("formatted");
       toast({ description: "Cleaned" });
     } catch (e) {
-      toast({ variant: "destructive", description: e instanceof Error ? e.message : "Failed to clean" });
+      toast({
+        variant: "destructive",
+        description: e instanceof Error ? e.message : "Failed to clean",
+      });
     }
   }, [input, toast]);
 
@@ -136,9 +241,14 @@ export default function Index() {
       const results = diffJson(input, secondInput, structuralDiff);
       setDiffResults(results);
       setViewMode("diff");
-      toast({ description: `${results.length} difference${results.length !== 1 ? "s" : ""}` });
+      toast({
+        description: `${results.length} difference${results.length !== 1 ? "s" : ""}`,
+      });
     } catch (e) {
-      toast({ variant: "destructive", description: e instanceof Error ? e.message : "Failed to diff" });
+      toast({
+        variant: "destructive",
+        description: e instanceof Error ? e.message : "Failed to diff",
+      });
     }
   }, [input, secondInput, structuralDiff, toast]);
 
@@ -148,7 +258,10 @@ export default function Index() {
       setTableData(data);
       setViewMode("table");
     } else {
-      toast({ variant: "destructive", description: "Cannot convert to table" });
+      toast({
+        variant: "destructive",
+        description: "Cannot convert to table",
+      });
     }
   }, [input, toast]);
 
@@ -162,7 +275,10 @@ export default function Index() {
       setSchemaOutput(schema);
       setViewMode("types");
     } catch (e) {
-      toast({ variant: "destructive", description: e instanceof Error ? e.message : "Failed to generate" });
+      toast({
+        variant: "destructive",
+        description: e instanceof Error ? e.message : "Failed to generate",
+      });
     }
   }, [input, toast]);
 
@@ -171,7 +287,10 @@ export default function Index() {
       setOutput(input);
       setViewMode("foldable");
     } else {
-      toast({ variant: "destructive", description: "Invalid JSON" });
+      toast({
+        variant: "destructive",
+        description: "Invalid JSON",
+      });
     }
   }, [input, toast]);
 
@@ -182,7 +301,10 @@ export default function Index() {
       await navigator.clipboard.writeText(textToCopy);
       toast({ description: "Copied" });
     } catch {
-      toast({ variant: "destructive", description: "Failed to copy" });
+      toast({
+        variant: "destructive",
+        description: "Failed to copy",
+      });
     }
   }, [output, input, viewMode, toast]);
 
@@ -202,26 +324,35 @@ export default function Index() {
     setInput(SAMPLE_JSON);
   }, [setInput]);
 
-  const handleExtract = useCallback((path: string) => {
-    try {
-      const extracted = extractAtPath(input, path);
-      setOutput(extracted);
-      setViewMode("formatted");
-      toast({ description: `Extracted ${path}` });
-    } catch (e) {
-      toast({ variant: "destructive", description: e instanceof Error ? e.message : "Failed to extract" });
-    }
-  }, [input, toast]);
+  const handleExtract = useCallback(
+    (path: string) => {
+      try {
+        const extracted = extractAtPath(input, path);
+        setOutput(extracted);
+        setViewMode("formatted");
+        toast({ description: `Extracted ${path}` });
+      } catch (e) {
+        toast({
+          variant: "destructive",
+          description: e instanceof Error ? e.message : "Failed to extract",
+        });
+      }
+    },
+    [input, toast]
+  );
 
   const handleToggleCanonical = useCallback(() => {
     setCanonicalMode((prev) => !prev);
   }, [setCanonicalMode]);
 
-  const handleFoldableExtract = useCallback((path: string, value: unknown) => {
-    setOutput(JSON.stringify(value, null, 2));
-    setViewMode("formatted");
-    toast({ description: `Extracted ${path}` });
-  }, [toast]);
+  const handleFoldableExtract = useCallback(
+    (path: string, value: unknown) => {
+      setOutput(JSON.stringify(value, null, 2));
+      setViewMode("formatted");
+      toast({ description: `Extracted ${path}` });
+    },
+    [toast]
+  );
 
   const validation = validateJson(input);
 
@@ -254,276 +385,390 @@ export default function Index() {
     { icon: BarChart3, text: "Analyze structure" },
     { icon: Shuffle, text: "Transform data" },
     { icon: Shield, text: "Custom validation" },
+    { icon: Package, text: "Batch processing" },
+    { icon: FileOutput, text: "Advanced export" },
+    { icon: Layers2, text: "Enhanced diff" },
+    { icon: Zap, text: "Performance optimized" },
+    { icon: Terminal, text: "Keyboard navigation" },
   ];
 
   return (
-    <Layout showCommandButton onOpenCommand={() => setCommandOpen(true)}>
-      <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary">
+    <Layout features={features} onOpenCommands={() => setCommandOpen(true)}>
+      <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} commands={commands} />
 
+      <div className="flex flex-col h-full">
+        {/* Premium Toolbar - Ultra Minimalist */}
+        <div className="px-8 py-5 border-b bg-gradient-to-b from-background/80 to-background backdrop-blur-xl">
+          <div className="flex items-center justify-between gap-6 max-w-[2000px] mx-auto">
+            {/* Primary Actions Group */}
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleFormat}
+                disabled={!input}
+                size="sm"
+                className="h-9 px-4 gap-2 font-medium shadow-sm hover:shadow transition-all duration-200"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Format
+              </Button>
+              <Button
+                onClick={handleMinify}
+                disabled={!input}
+                variant="outline"
+                size="sm"
+                className="h-9 px-4 gap-2 font-medium hover:bg-muted/50 transition-all duration-200"
+              >
+                <Minimize2 className="w-3.5 h-3.5" />
+                Minify
+              </Button>
+              <Button
+                onClick={handleClean}
+                disabled={!input}
+                variant="outline"
+                size="sm"
+                className="h-9 px-4 gap-2 font-medium hover:bg-muted/50 transition-all duration-200"
+              >
+                <Eraser className="w-3.5 h-3.5" />
+                Clean
+              </Button>
+              <Button
+                onClick={handleSort}
+                disabled={!input}
+                variant="outline"
+                size="sm"
+                className="h-9 px-4 gap-2 font-medium hover:bg-muted/50 transition-all duration-200"
+              >
+                <ArrowDownAZ className="w-3.5 h-3.5" />
+                Sort
+              </Button>
 
+              <div className="w-px h-6 bg-border mx-1" />
 
-        {/* Toolbar - Sticky & Glassmorphic */}
-        <div className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-          <div className="container mx-auto px-2 sm:px-4 py-2">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-              {/* Operations Group */}
-              <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/40 border border-border/20 overflow-x-auto scrollbar-none w-full sm:w-auto">
-                <Button variant="ghost" size="sm" onClick={handleFormat} disabled={!validation.valid} className="h-7 sm:h-8 gap-1 sm:gap-2 hover:bg-background hover:shadow-sm font-medium text-xs px-2 sm:px-3">
-                  <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Format</span>
-                </Button>
-                <div className="w-px h-4 bg-border/50 mx-0.5 sm:mx-1" />
-                <Button variant="ghost" size="sm" onClick={handleMinify} disabled={!validation.valid} className="h-7 sm:h-8 gap-1 sm:gap-2 hover:bg-background hover:shadow-sm font-medium text-xs px-2 sm:px-3">
-                  <Minimize2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Minify</span>
-                </Button>
-                <Button variant="ghost" size="sm" onClick={handleClean} disabled={!validation.valid} className="h-7 sm:h-8 gap-1 sm:gap-2 hover:bg-background hover:shadow-sm font-medium text-xs px-2 sm:px-3">
-                  <Eraser className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Clean</span>
-                </Button>
-                <Button variant="ghost" size="sm" onClick={handleSort} disabled={!validation.valid} className="h-7 sm:h-8 gap-1 sm:gap-2 hover:bg-background hover:shadow-sm font-medium text-xs px-2 sm:px-3">
-                  <ArrowDownAZ className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Sort</span>
-                </Button>
-              </div>
-
-              {/* View Modes Group */}
-              <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/40 border border-border/20 overflow-x-auto scrollbar-none w-full sm:w-auto">
+              {/* View Mode Pills */}
+              <div className="flex items-center gap-1 bg-muted/30 rounded-lg p-1">
                 <Button
-                  variant={viewMode === "table" ? "secondary" : "ghost"}
-                  size="sm"
                   onClick={handleTable}
                   disabled={!validation.valid}
-                  className={`h-7 sm:h-8 gap-1 sm:gap-2 text-xs px-2 sm:px-3 transition-all ${viewMode === "table" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"}`}
+                  variant="ghost"
+                  size="sm"
+                  className={`h-7 px-3 gap-1.5 text-xs font-medium rounded-md transition-all duration-200 ${viewMode === "table"
+                      ? "bg-background shadow-sm"
+                      : "hover:bg-background/50"
+                    }`}
                 >
-                  <Table className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Table</span>
+                  <Table className="w-3 h-3" />
+                  Table
                 </Button>
                 <Button
-                  variant={viewMode === "types" ? "secondary" : "ghost"}
-                  size="sm"
                   onClick={handleTypes}
                   disabled={!validation.valid}
-                  className={`h-7 sm:h-8 gap-1 sm:gap-2 text-xs px-2 sm:px-3 transition-all ${viewMode === "types" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"}`}
+                  variant="ghost"
+                  size="sm"
+                  className={`h-7 px-3 gap-1.5 text-xs font-medium rounded-md transition-all duration-200 ${viewMode === "types"
+                      ? "bg-background shadow-sm"
+                      : "hover:bg-background/50"
+                    }`}
                 >
-                  <FileCode className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Types</span>
+                  <FileCode className="w-3 h-3" />
+                  Types
                 </Button>
                 <Button
-                  variant={viewMode === "analyze" ? "secondary" : "ghost"}
-                  size="sm"
                   onClick={() => setViewMode("analyze")}
                   disabled={!validation.valid}
-                  className={`h-7 sm:h-8 gap-1 sm:gap-2 text-xs px-2 sm:px-3 transition-all ${viewMode === "analyze" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"}`}
-                >
-                  <BarChart3 className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Analyze</span>
-                </Button>
-
-                <div className="w-px h-4 bg-border/50 mx-0.5 sm:mx-1" />
-
-                <Button
-                  variant={viewMode === "diff" ? "secondary" : "ghost"}
+                  variant="ghost"
                   size="sm"
-                  onClick={handleDiff}
-                  disabled={!validateJson(input).valid}
-                  className={`h-7 sm:h-8 gap-1 sm:gap-2 text-xs px-2 sm:px-3 transition-all ${viewMode === "diff" ? "bg-background shadow-sm text-amber-500" : "text-muted-foreground hover:text-amber-500"}`}
+                  className={`h-7 px-3 gap-1.5 text-xs font-medium rounded-md transition-all duration-200 ${viewMode === "analyze"
+                      ? "bg-background shadow-sm"
+                      : "hover:bg-background/50"
+                    }`}
                 >
-                  <GitCompare className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Diff</span>
-                </Button>
-              </div>
-
-              {/* Utility Actions */}
-              <div className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto">
-                <Button
-                  variant={canonicalMode ? "default" : "outline"}
-                  size="sm"
-                  onClick={handleToggleCanonical}
-                  className={`h-7 sm:h-8 gap-1 sm:gap-2 text-xs font-mono transition-all px-2 sm:px-3 ${canonicalMode ? "bg-primary text-primary-foreground" : "border-border/40 text-muted-foreground"}`}
-                >
-                  <Hash className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                  <span className="hidden sm:inline">Canonical</span>
-                </Button>
-
-                <div className="flex items-center rounded-md border border-border/40 bg-background/50">
-                  <Button variant="info" size="sm" onClick={handleLoadSample} className="h-7 sm:h-8 px-2 sm:px-3 text-xs font-medium">
-                    <FileJson className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-2" /> <span className="hidden sm:inline">Sample</span>
-                  </Button>
-                  <div className="w-px h-4 bg-border/40" />
-                  <Button variant="ghost" size="sm" onClick={handleClear} className="h-7 sm:h-8 px-2 sm:px-3 text-muted-foreground hover:text-destructive text-xs font-medium">
-                    <RotateCcw className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-2" /> <span className="hidden sm:inline">Clear</span>
-                  </Button>
-                </div>
-
-                <Button
-                  variant="brand"
-                  onClick={handleCopy}
-                  disabled={!output && viewMode === "formatted"}
-                  className="h-7 sm:h-8 px-2 sm:px-4 text-xs font-bold shadow-lg"
-                >
-                  <Copy className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-2" /> Copy
+                  <BarChart3 className="w-3 h-3" />
+                  Analyze
                 </Button>
               </div>
             </div>
 
-            {/* Extended Toolbar (Second Row) */}
-            <div className="flex items-center gap-1 mt-2 pb-1 overflow-x-auto scrollbar-none text-xs text-muted-foreground/60 font-mono">
-              <span className="px-2 whitespace-nowrap">Modes:</span>
-              <button onClick={() => setViewMode("query")} disabled={!validation.valid} className={`hover:text-primary px-2 py-0.5 rounded transition-colors whitespace-nowrap ${viewMode === 'query' ? 'text-primary bg-primary/10' : ''}`}>Query</button>
-              <span className="opacity-20">|</span>
-              <button onClick={() => setViewMode("transform")} disabled={!validation.valid} className={`hover:text-primary px-2 py-0.5 rounded transition-colors whitespace-nowrap ${viewMode === 'transform' ? 'text-primary bg-primary/10' : ''}`}>Transform</button>
-              <span className="opacity-20">|</span>
-              <button onClick={() => setViewMode("validate")} disabled={!validation.valid} className={`hover:text-primary px-2 py-0.5 rounded transition-colors whitespace-nowrap ${viewMode === 'validate' ? 'text-primary bg-primary/10' : ''}`}>Validate</button>
-              <span className="opacity-20">|</span>
-              <button onClick={handleFoldable} disabled={!validation.valid} className={`hover:text-primary px-2 py-0.5 rounded transition-colors whitespace-nowrap ${viewMode === 'foldable' ? 'text-primary bg-primary/10' : ''}`}>Tree View</button>
+            {/* Secondary Actions */}
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleDiff}
+                disabled={!input || !secondInput}
+                variant="outline"
+                size="sm"
+                className="h-9 px-4 gap-2 font-medium hover:bg-muted/50 transition-all duration-200"
+              >
+                <GitCompare className="w-3.5 h-3.5" />
+                Diff
+              </Button>
+
+              <Button
+                onClick={handleToggleCanonical}
+                variant={canonicalMode ? "default" : "outline"}
+                size="sm"
+                className="h-9 px-4 gap-2 font-medium transition-all duration-200"
+              >
+                <Hash className="w-3.5 h-3.5" />
+                Canonical
+              </Button>
+
+              <div className="w-px h-6 bg-border mx-1" />
+
+              <Button
+                onClick={handleLoadSample}
+                variant="outline"
+                size="sm"
+                className="h-9 px-3.5 gap-2 font-medium hover:bg-muted/50 transition-all duration-200"
+              >
+                <FileJson className="w-3.5 h-3.5" />
+                Sample
+              </Button>
+              <Button
+                onClick={handleClear}
+                variant="outline"
+                size="sm"
+                className="h-9 px-3.5 gap-2 font-medium hover:bg-muted/50 transition-all duration-200"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                Clear
+              </Button>
+              <Button
+                onClick={handleCopy}
+                disabled={!output && !input}
+                variant="outline"
+                size="sm"
+                className="h-9 px-3.5 gap-2 font-medium hover:bg-muted/50 transition-all duration-200"
+              >
+                <Copy className="w-3.5 h-3.5" />
+                Copy
+              </Button>
+            </div>
+          </div>
+
+          {/* Advanced Tools Dropdown */}
+          <div className="flex items-center gap-2 mt-4 pt-4 border-t">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Advanced Tools
+            </span>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {[
+                { key: "query", label: "Query", icon: Search },
+                { key: "transform", label: "Transform", icon: Shuffle },
+                { key: "validate", label: "Validate", icon: Shield },
+                { key: "batch", label: "Batch", icon: Package },
+                { key: "export", label: "Export", icon: FileOutput },
+                { key: "enhanced-diff", label: "Enhanced Diff", icon: Layers2 },
+              ].map(({ key, label, icon: Icon }) => (
+                <Button
+                  key={key}
+                  onClick={() => setViewMode(key as ViewMode)}
+                  disabled={key !== "batch" && !validation.valid}
+                  variant="ghost"
+                  size="sm"
+                  className={`h-7 px-3 gap-1.5 text-xs font-medium rounded-md transition-all duration-200 ${viewMode === key
+                      ? "bg-primary/10 text-primary border border-primary/20"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }`}
+                >
+                  <Icon className="w-3 h-3" />
+                  {label}
+                </Button>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Main Work Area */}
-        <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 h-[calc(100vh-12rem)] sm:h-[calc(100vh-10rem)] min-h-[400px] sm:min-h-[600px]">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6 h-full">
-
-            {/* LEFT PANEL: Input */}
-            <div className="flex flex-col gap-2 sm:gap-4 h-full">
-              <div className="flex-1 relative group rounded-xl border border-border/40 bg-card/20 backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-primary/20">
-                {/* Panel Header */}
-                <div className="absolute top-0 left-0 right-0 h-8 sm:h-9 bg-muted/30 border-b border-border/20 flex items-center px-2 sm:px-3 z-10">
-                  <div className="flex gap-1 sm:gap-1.5 mr-2 sm:mr-4">
-                    <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-border/40 transition-colors"></div>
-                    <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-border/40 transition-colors"></div>
-                    <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-border/40 transition-colors"></div>
+        {/* Workspace - Premium Layout */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Input Panel - Refined */}
+          <div className="flex-1 flex flex-col border-r min-w-0">
+            <div className="px-6 py-4 border-b bg-muted/20 backdrop-blur-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-sm font-semibold tracking-tight">input.json</span>
                   </div>
-                  <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">Input.json</span>
-                  <div className="ml-auto">
-                    {!validation.valid && input && (
-                      <span className="flex items-center text-[9px] sm:text-[10px] text-destructive bg-destructive/10 px-1.5 sm:px-2 py-0.5 rounded-full">
-                        <Shield className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" /> <span className="hidden sm:inline">Invalid Syntax</span>
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="pt-8 sm:pt-9 h-full">
-                  <JsonEditor
-                    value={input}
-                    onChange={setInput}
-                    label=""
-                    onExtract={handleExtract}
-                    placeholder="Paste JSON here..."
-                  />
+                  {!validation.valid && input && (
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-destructive/10 text-destructive">
+                      <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                      <span className="text-xs font-medium">Invalid JSON</span>
+                    </div>
+                  )}
+                  {validation.valid && input && (
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span className="text-xs font-medium">Valid JSON</span>
+                    </div>
+                  )}
                 </div>
               </div>
-
-              {/* Second input for diff (Conditional) */}
-              {(viewMode === "diff" || secondInput) && (
-                <div className="flex-1 relative rounded-xl border border-border/40 bg-card/20 backdrop-blur-sm overflow-hidden">
-                  <div className="absolute top-0 left-0 right-0 h-8 sm:h-9 bg-amber-500/5 border-b border-amber-500/20 flex items-center px-2 sm:px-3 z-10">
-                    <GitCompare className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-500 mr-1 sm:mr-2" />
-                    <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-amber-500 font-semibold">Comparison.json</span>
-                  </div>
-                  <div className="pt-8 sm:pt-9 h-full">
-                    <JsonEditor
-                      value={secondInput}
-                      onChange={setSecondInput}
-                      label=""
-                      placeholder="Paste second JSON to compare..."
-                    />
-                  </div>
-                </div>
-              )}
             </div>
+            <div className="flex-1 overflow-hidden">
+              <JsonEditor value={input} onChange={setInput} placeholder="Paste your JSON here..." />
+            </div>
+          </div>
 
-            {/* RIGHT PANEL: Output */}
-            <div className="flex flex-col h-full rounded-xl border border-border/40 bg-gradient-to-b from-card/30 to-background/50 backdrop-blur-md overflow-hidden shadow-2xl shadow-black/5">
+          {/* Comparison Panel - Conditional */}
+          {(viewMode === "diff" || viewMode === "enhanced-diff" || secondInput) && (
+            <div className="flex-1 flex flex-col border-r min-w-0">
+              <div className="px-6 py-4 border-b bg-muted/20 backdrop-blur-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                  <span className="text-sm font-semibold tracking-tight">comparison.json</span>
+                </div>
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <JsonEditor
+                  value={secondInput}
+                  onChange={setSecondInput}
+                  placeholder="Paste comparison JSON..."
+                />
+              </div>
+            </div>
+          )}
 
-              {/* Output Header */}
-              <div className="h-8 sm:h-10 border-b border-border/40 bg-muted/20 flex items-center px-2 justify-between">
-                <div className="flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2">
-                  <div className="p-0.5 sm:p-1 rounded bg-primary/10">
-                    {viewMode === "formatted" && <Code className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />}
-                    {viewMode === "diff" && <GitCompare className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-500" />}
-                    {viewMode === "table" && <Table className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-500" />}
-                    {viewMode === "types" && <FileCode className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-purple-500" />}
-                    {viewMode === "foldable" && <Layers className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-green-500" />}
-                    {viewMode === "query" && <Search className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-pink-500" />}
-                    {viewMode === "analyze" && <BarChart3 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-indigo-500" />}
-                    {viewMode === "transform" && <Shuffle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-orange-500" />}
-                    {viewMode === "validate" && <Shield className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-500" />}
+          {/* Output Panel - Premium Design */}
+          <div className="flex-1 flex flex-col min-w-0 bg-muted/5">
+            <div className="px-6 py-4 border-b bg-gradient-to-b from-muted/30 to-muted/10 backdrop-blur-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 text-foreground">
+                    {viewMode === "formatted" && <Code className="w-4 h-4" />}
+                    {viewMode === "diff" && <GitCompare className="w-4 h-4" />}
+                    {viewMode === "table" && <Table className="w-4 h-4" />}
+                    {viewMode === "types" && <FileCode className="w-4 h-4" />}
+                    {viewMode === "foldable" && <Layers className="w-4 h-4" />}
+                    {viewMode === "query" && <Search className="w-4 h-4" />}
+                    {viewMode === "analyze" && <BarChart3 className="w-4 h-4" />}
+                    {viewMode === "transform" && <Shuffle className="w-4 h-4" />}
+                    {viewMode === "validate" && <Shield className="w-4 h-4" />}
+                    {viewMode === "batch" && <Package className="w-4 h-4" />}
+                    {viewMode === "export" && <FileOutput className="w-4 h-4" />}
+                    {viewMode === "enhanced-diff" && <Layers2 className="w-4 h-4" />}
+                    <span className="text-sm font-semibold tracking-tight">
+                      {viewMode === "formatted" && "Formatted Output"}
+                      {viewMode === "diff" && "JSON Differences"}
+                      {viewMode === "table" && "Table View"}
+                      {viewMode === "types" && "Type Definitions"}
+                      {viewMode === "foldable" && "Tree Explorer"}
+                      {viewMode === "query" && "JSONPath Query"}
+                      {viewMode === "analyze" && "Structure Analysis"}
+                      {viewMode === "transform" && "Data Transformation"}
+                      {viewMode === "validate" && "Custom Validation"}
+                      {viewMode === "batch" && "Batch Processing"}
+                      {viewMode === "export" && "Advanced Export"}
+                      {viewMode === "enhanced-diff" && "Enhanced Diff View"}
+                    </span>
                   </div>
-                  <span className="text-[10px] sm:text-xs font-semibold font-mono tracking-tight text-foreground/80">
-                    {viewMode === "formatted" && "Output"}
-                    {viewMode === "diff" && "Differences"}
-                    {viewMode === "table" && "Table View"}
-                    {viewMode === "types" && "Type Definitions"}
-                    {viewMode === "foldable" && "Tree Explorer"}
-                    {viewMode === "query" && "JSON Query"}
-                    {viewMode === "analyze" && "Structure Analysis"}
-                    {viewMode === "transform" && "Transformation"}
-                    {viewMode === "validate" && "Validation Rules"}
-                  </span>
                   {canonicalMode && viewMode === "formatted" && (
-                    <div className="px-1 sm:px-1.5 py-0.5 rounded border border-primary/30 bg-primary/5 text-[8px] sm:text-[10px] text-primary font-mono uppercase tracking-widest">Canonical</div>
+                    <div className="px-2 py-1 rounded-md bg-primary/10 text-primary border border-primary/20">
+                      <span className="text-xs font-medium">Canonical Mode</span>
+                    </div>
                   )}
                 </div>
 
-                <div className="flex bg-muted/50 p-0.5 rounded-lg border border-border/20">
-                  <button
+                {/* View Toggle */}
+                <div className="flex items-center gap-1 bg-muted/30 rounded-lg p-1">
+                  <Button
                     onClick={() => setViewMode("formatted")}
-                    className={`p-1 sm:p-1.5 rounded-md transition-all ${viewMode === 'formatted' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                    variant="ghost"
+                    size="sm"
+                    className={`h-7 w-7 p-0 rounded-md transition-all duration-200 ${viewMode === "formatted"
+                        ? "bg-background shadow-sm text-primary"
+                        : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                      }`}
                     title="Code View"
                   >
-                    <Code className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                  </button>
-                  <button
+                    <Code className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
                     onClick={() => output && setViewMode("foldable")}
                     disabled={!output}
-                    className={`p-1 sm:p-1.5 rounded-md transition-all ${viewMode === 'foldable' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground disabled:opacity-30'}`}
+                    variant="ghost"
+                    size="sm"
+                    className={`h-7 w-7 p-0 rounded-md transition-all duration-200 ${viewMode === "foldable"
+                        ? "bg-background shadow-sm text-primary"
+                        : "text-muted-foreground hover:text-foreground hover:bg-background/50 disabled:opacity-30"
+                      }`}
                     title="Tree View"
                   >
-                    <Layers className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                  </button>
-                  <button
+                    <Layers className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
                     onClick={() => setViewMode("table")}
-                    className={`p-1 sm:p-1.5 rounded-md transition-all ${viewMode === 'table' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                    variant="ghost"
+                    size="sm"
+                    className={`h-7 w-7 p-0 rounded-md transition-all duration-200 ${viewMode === "table"
+                        ? "bg-background shadow-sm text-primary"
+                        : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                      }`}
                     title="Table View"
                   >
-                    <Table className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Output Content Area */}
-              <div className="flex-1 overflow-hidden relative">
-                {viewMode === "formatted" && (
-                  output ? (
-                    <div className="h-full overflow-auto scrollbar-thin scrollbar-thumb-border/50 p-2 sm:p-4">
-                      <pre className="font-mono text-xs leading-relaxed text-foreground/90" dangerouslySetInnerHTML={{ __html: highlightJson(output) }} />
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-muted-foreground/40 gap-2 sm:gap-4 p-4">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full"></div>
-                        <Code className="w-8 h-8 sm:w-12 sm:h-12 relative z-10" />
-                      </div>
-                      <div className="text-center space-y-1">
-                        <p className="text-xs sm:text-sm font-medium text-foreground/60">Ready to process</p>
-                        <p className="text-xs font-mono">Output will appear here</p>
-                      </div>
-                    </div>
-                  )
-                )}
-
-                {/* Other Views Rendered Here */}
-                <div className="h-full overflow-auto bg-card/10">
-                  {viewMode === "foldable" && output && <FoldableJsonViewer json={output} onExtract={handleFoldableExtract} />}
-                  {viewMode === "diff" && <DiffViewer diffs={diffResults} structuralMode={structuralDiff} onToggleStructural={setStructuralDiff} />}
-                  {viewMode === "table" && tableData && <TableViewer headers={tableData.headers} rows={tableData.rows} />}
-                  {viewMode === "types" && <TypesViewer typescript={typescriptOutput} zod={zodOutput} schema={schemaOutput} />}
-                  {viewMode === "query" && <JsonQuery json={input} />}
-                  {viewMode === "analyze" && <JsonAnalyzer json={input} />}
-                  {viewMode === "transform" && <JsonTransformer json={input} secondJson={secondInput} onResult={setOutput} />}
-                  {viewMode === "validate" && <JsonValidator json={input} />}
+                    <Table className="w-3.5 h-3.5" />
+                  </Button>
                 </div>
               </div>
             </div>
+
+            {/* Content Area - Ultra Clean */}
+            <div className="flex-1 overflow-auto">
+              {viewMode === "formatted" &&
+                (output ? (
+                  <div className="p-6">
+                    <pre className="text-sm font-mono leading-relaxed bg-muted/30 rounded-xl p-6 overflow-x-auto border shadow-sm">
+                      <code>{output}</code>
+                    </pre>
+                  </div>
+                ) : (
+                  <div className="h-full flex items-center justify-center p-12">
+                    <div className="text-center space-y-4 max-w-md">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto">
+                        <Sparkles className="w-8 h-8 text-primary" />
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="text-lg font-semibold tracking-tight">Ready to Process</h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          Paste JSON in the input panel to see formatted output, or use the toolbar to explore
+                          different processing modes.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+              {/* Dynamic Content Views */}
+              {viewMode === "foldable" && output && (
+                <FoldableJsonViewer json={output} onExtract={handleFoldableExtract} />
+              )}
+              {viewMode === "diff" && <DiffViewer input={input} secondInput={secondInput} results={diffResults} />}
+              {viewMode === "enhanced-diff" && (
+                <EnhancedDiffViewer input={input} secondInput={secondInput} structuralDiff={structuralDiff} />
+              )}
+              {viewMode === "table" && tableData && <TableViewer data={tableData} />}
+              {viewMode === "types" && (
+                <TypesViewer
+                  typescriptOutput={typescriptOutput}
+                  zodOutput={zodOutput}
+                  schemaOutput={schemaOutput}
+                />
+              )}
+              {viewMode === "query" && <JsonQuery input={input} onExtract={handleExtract} />}
+              {viewMode === "analyze" && <JsonAnalyzer input={input} />}
+              {viewMode === "transform" && <JsonTransformer input={input} />}
+              {viewMode === "validate" && <JsonValidator input={input} />}
+              {viewMode === "batch" && (
+                <BatchProcessor
+                  onBatchComplete={(results) =>
+                    toast({
+                      description: `Processed ${results.length} files`,
+                    })
+                  }
+                />
+              )}
+              {viewMode === "export" && <AdvancedExporter input={input} />}
+            </div>
           </div>
         </div>
-
-        <CommandPalette commands={commands} open={commandOpen} onOpenChange={setCommandOpen} />
       </div>
     </Layout>
   );

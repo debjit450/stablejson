@@ -13,10 +13,10 @@ export function NavLink({ to, children, className }: NavLinkProps) {
       to={to}
       className={({ isActive }) =>
         cn(
-          "px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-colors duration-200 rounded-lg whitespace-nowrap",
+          "px-3 py-2 text-sm font-medium transition-all duration-200 rounded-lg whitespace-nowrap hover-lift",
           isActive
-            ? "text-foreground bg-[hsl(var(--brand)/0.1)] shadow-sm"
-            : "text-muted-foreground hover:text-[hsl(var(--info))] hover:bg-[hsl(var(--accent-secondary)/0.1)]",
+            ? "text-primary bg-primary/10 border border-primary/20 shadow-sm"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
           className
         )
       }
