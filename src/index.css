@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -131,29 +131,46 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'ss01';
+    font-family: 'Syne', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-weight: 400;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.005em;
+    line-height: 1.6;
   }
 
   .font-mono {
-    font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    font-family: 'JetBrains Mono', 'Space Mono', ui-monospace, SFMono-Regular, monospace;
     font-feature-settings: 'liga', 'calt';
   }
 
   .font-display {
-    font-family: 'Geist', 'Inter', system-ui, sans-serif;
+    font-family: 'Syne', system-ui, sans-serif;
     font-weight: 600;
     letter-spacing: -0.025em;
   }
 
   .font-body {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Syne', system-ui, sans-serif;
     font-weight: 400;
     letter-spacing: -0.005em;
+  }
+
+  .font-content {
+    font-family: 'Syne', system-ui, sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.005em;
+    line-height: 1.6;
+  }
+
+  .font-code {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    font-feature-settings: 'liga', 'calt';
+  }
+
+  .font-mono-alt {
+    font-family: 'Space Mono', ui-monospace, SFMono-Regular, monospace;
+    font-feature-settings: 'liga', 'calt';
   }
 }
 
@@ -168,29 +185,16 @@
     @apply bg-card border border-border rounded-lg shadow-sm;
     background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.98) 100%);
     backdrop-filter: blur(8px);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .premium-card:hover {
-    @apply shadow-md;
-    transform: translateY(-1px);
+    transition: colors 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .premium-button {
     @apply inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium;
-    @apply transition-all duration-200 ease-out;
+    @apply transition-colors duration-200 ease-out;
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
     @apply disabled:pointer-events-none disabled:opacity-50;
     font-feature-settings: 'cv02', 'cv03';
     letter-spacing: -0.005em;
-  }
-
-  .premium-button:hover {
-    transform: translateY(-0.5px);
-  }
-
-  .premium-button:active {
-    transform: translateY(0);
   }
 
   .syntax-key {
@@ -273,21 +277,12 @@
   }
 
   .animate-fade-in {
-    animation: fade-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .animate-slide-up {
-    animation: slide-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  @keyframes slide-up {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    opacity: 1;
+    transform: translateY(0);
   }
 }

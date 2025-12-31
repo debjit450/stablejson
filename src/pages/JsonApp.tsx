@@ -264,160 +264,157 @@ export default function Index() {
 
         {/* Toolbar - Sticky & Glassmorphic */}
         <div className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-          <div className="container mx-auto px-4 py-2">
-            <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="container mx-auto px-2 sm:px-4 py-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
               {/* Operations Group */}
-              <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/40 border border-border/20 overflow-x-auto scrollbar-none">
-                <Button variant="ghost" size="sm" onClick={handleFormat} disabled={!validation.valid} className="h-8 gap-2 hover:bg-background hover:shadow-sm font-medium text-xs">
-                  <Sparkles className="w-3.5 h-3.5" /> Format
+              <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/40 border border-border/20 overflow-x-auto scrollbar-none w-full sm:w-auto">
+                <Button variant="ghost" size="sm" onClick={handleFormat} disabled={!validation.valid} className="h-7 sm:h-8 gap-1 sm:gap-2 hover:bg-background hover:shadow-sm font-medium text-xs px-2 sm:px-3">
+                  <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Format</span>
                 </Button>
-                <div className="w-px h-4 bg-border/50 mx-1" />
-                <Button variant="ghost" size="sm" onClick={handleMinify} disabled={!validation.valid} className="h-8 gap-2 hover:bg-background hover:shadow-sm font-medium text-xs">
-                  <Minimize2 className="w-3.5 h-3.5" /> Minify
+                <div className="w-px h-4 bg-border/50 mx-0.5 sm:mx-1" />
+                <Button variant="ghost" size="sm" onClick={handleMinify} disabled={!validation.valid} className="h-7 sm:h-8 gap-1 sm:gap-2 hover:bg-background hover:shadow-sm font-medium text-xs px-2 sm:px-3">
+                  <Minimize2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Minify</span>
                 </Button>
-                <Button variant="ghost" size="sm" onClick={handleClean} disabled={!validation.valid} className="h-8 gap-2 hover:bg-background hover:shadow-sm font-medium text-xs">
-                  <Eraser className="w-3.5 h-3.5" /> Clean
+                <Button variant="ghost" size="sm" onClick={handleClean} disabled={!validation.valid} className="h-7 sm:h-8 gap-1 sm:gap-2 hover:bg-background hover:shadow-sm font-medium text-xs px-2 sm:px-3">
+                  <Eraser className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Clean</span>
                 </Button>
-                <Button variant="ghost" size="sm" onClick={handleSort} disabled={!validation.valid} className="h-8 gap-2 hover:bg-background hover:shadow-sm font-medium text-xs">
-                  <ArrowDownAZ className="w-3.5 h-3.5" /> Sort
+                <Button variant="ghost" size="sm" onClick={handleSort} disabled={!validation.valid} className="h-7 sm:h-8 gap-1 sm:gap-2 hover:bg-background hover:shadow-sm font-medium text-xs px-2 sm:px-3">
+                  <ArrowDownAZ className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Sort</span>
                 </Button>
               </div>
 
               {/* View Modes Group */}
-              <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/40 border border-border/20 overflow-x-auto scrollbar-none">
+              <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/40 border border-border/20 overflow-x-auto scrollbar-none w-full sm:w-auto">
                 <Button
                   variant={viewMode === "table" ? "secondary" : "ghost"}
                   size="sm"
                   onClick={handleTable}
                   disabled={!validation.valid}
-                  className={`h-8 gap-2 text-xs transition-all ${viewMode === "table" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"}`}
+                  className={`h-7 sm:h-8 gap-1 sm:gap-2 text-xs px-2 sm:px-3 transition-all ${viewMode === "table" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"}`}
                 >
-                  <Table className="w-3.5 h-3.5" /> Table
+                  <Table className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Table</span>
                 </Button>
                 <Button
                   variant={viewMode === "types" ? "secondary" : "ghost"}
                   size="sm"
                   onClick={handleTypes}
                   disabled={!validation.valid}
-                  className={`h-8 gap-2 text-xs transition-all ${viewMode === "types" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"}`}
+                  className={`h-7 sm:h-8 gap-1 sm:gap-2 text-xs px-2 sm:px-3 transition-all ${viewMode === "types" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"}`}
                 >
-                  <FileCode className="w-3.5 h-3.5" /> Types
+                  <FileCode className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Types</span>
                 </Button>
                 <Button
                   variant={viewMode === "analyze" ? "secondary" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode("analyze")}
                   disabled={!validation.valid}
-                  className={`h-8 gap-2 text-xs transition-all ${viewMode === "analyze" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"}`}
+                  className={`h-7 sm:h-8 gap-1 sm:gap-2 text-xs px-2 sm:px-3 transition-all ${viewMode === "analyze" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"}`}
                 >
-                  <BarChart3 className="w-3.5 h-3.5" /> Analyze
+                  <BarChart3 className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Analyze</span>
                 </Button>
 
-                <div className="w-px h-4 bg-border/50 mx-1" />
+                <div className="w-px h-4 bg-border/50 mx-0.5 sm:mx-1" />
 
                 <Button
                   variant={viewMode === "diff" ? "secondary" : "ghost"}
                   size="sm"
                   onClick={handleDiff}
                   disabled={!validateJson(input).valid}
-                  className={`h-8 gap-2 text-xs transition-all ${viewMode === "diff" ? "bg-background shadow-sm text-amber-500" : "text-muted-foreground hover:text-amber-500"}`}
+                  className={`h-7 sm:h-8 gap-1 sm:gap-2 text-xs px-2 sm:px-3 transition-all ${viewMode === "diff" ? "bg-background shadow-sm text-amber-500" : "text-muted-foreground hover:text-amber-500"}`}
                 >
-                  <GitCompare className="w-3.5 h-3.5" /> Diff
+                  <GitCompare className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Diff</span>
                 </Button>
               </div>
 
-              <div className="flex-1" />
-
               {/* Utility Actions */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto">
                 <Button
                   variant={canonicalMode ? "default" : "outline"}
                   size="sm"
                   onClick={handleToggleCanonical}
-                  className={`h-8 gap-2 text-xs font-mono transition-all ${canonicalMode ? "bg-primary text-primary-foreground shadow-[0_0_10px_rgba(var(--primary),0.3)]" : "border-border/40 text-muted-foreground"}`}
+                  className={`h-7 sm:h-8 gap-1 sm:gap-2 text-xs font-mono transition-all px-2 sm:px-3 ${canonicalMode ? "bg-primary text-primary-foreground" : "border-border/40 text-muted-foreground"}`}
                 >
-                  <Hash className="w-3.5 h-3.5" />
+                  <Hash className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   <span className="hidden sm:inline">Canonical</span>
                 </Button>
 
                 <div className="flex items-center rounded-md border border-border/40 bg-background/50">
-                  <Button variant="ghost" size="sm" onClick={handleLoadSample} className="h-8 px-3 text-muted-foreground hover:text-foreground text-xs font-medium">
-                    <FileJson className="w-3.5 h-3.5 mr-2" /> Sample
+                  <Button variant="ghost" size="sm" onClick={handleLoadSample} className="h-7 sm:h-8 px-2 sm:px-3 text-muted-foreground hover:text-foreground text-xs font-medium">
+                    <FileJson className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-2" /> <span className="hidden sm:inline">Sample</span>
                   </Button>
                   <div className="w-px h-4 bg-border/40" />
-                  <Button variant="ghost" size="sm" onClick={handleClear} className="h-8 px-3 text-muted-foreground hover:text-destructive text-xs font-medium">
-                    <RotateCcw className="w-3.5 h-3.5 mr-2" /> Clear
+                  <Button variant="ghost" size="sm" onClick={handleClear} className="h-7 sm:h-8 px-2 sm:px-3 text-muted-foreground hover:text-destructive text-xs font-medium">
+                    <RotateCcw className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-2" /> <span className="hidden sm:inline">Clear</span>
                   </Button>
                 </div>
 
                 <Button
                   onClick={handleCopy}
                   disabled={!output && viewMode === "formatted"}
-                  className="h-8 px-4 bg-foreground text-background hover:bg-foreground/90 text-xs font-bold shadow-lg"
+                  className="h-7 sm:h-8 px-2 sm:px-4 bg-foreground text-background hover:bg-foreground/90 text-xs font-bold shadow-lg"
                 >
-                  <Copy className="w-3.5 h-3.5 mr-2" /> Copy
+                  <Copy className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-2" /> Copy
                 </Button>
               </div>
             </div>
 
             {/* Extended Toolbar (Second Row) */}
             <div className="flex items-center gap-1 mt-2 pb-1 overflow-x-auto scrollbar-none text-xs text-muted-foreground/60 font-mono">
-              <span className="px-2">Modes:</span>
-              <button onClick={() => setViewMode("query")} disabled={!validation.valid} className={`hover:text-primary px-2 py-0.5 rounded transition-colors ${viewMode === 'query' ? 'text-primary bg-primary/10' : ''}`}>Query</button>
+              <span className="px-2 whitespace-nowrap">Modes:</span>
+              <button onClick={() => setViewMode("query")} disabled={!validation.valid} className={`hover:text-primary px-2 py-0.5 rounded transition-colors whitespace-nowrap ${viewMode === 'query' ? 'text-primary bg-primary/10' : ''}`}>Query</button>
               <span className="opacity-20">|</span>
-              <button onClick={() => setViewMode("transform")} disabled={!validation.valid} className={`hover:text-primary px-2 py-0.5 rounded transition-colors ${viewMode === 'transform' ? 'text-primary bg-primary/10' : ''}`}>Transform</button>
+              <button onClick={() => setViewMode("transform")} disabled={!validation.valid} className={`hover:text-primary px-2 py-0.5 rounded transition-colors whitespace-nowrap ${viewMode === 'transform' ? 'text-primary bg-primary/10' : ''}`}>Transform</button>
               <span className="opacity-20">|</span>
-              <button onClick={() => setViewMode("validate")} disabled={!validation.valid} className={`hover:text-primary px-2 py-0.5 rounded transition-colors ${viewMode === 'validate' ? 'text-primary bg-primary/10' : ''}`}>Validate</button>
+              <button onClick={() => setViewMode("validate")} disabled={!validation.valid} className={`hover:text-primary px-2 py-0.5 rounded transition-colors whitespace-nowrap ${viewMode === 'validate' ? 'text-primary bg-primary/10' : ''}`}>Validate</button>
               <span className="opacity-20">|</span>
-              <button onClick={handleFoldable} disabled={!validation.valid} className={`hover:text-primary px-2 py-0.5 rounded transition-colors ${viewMode === 'foldable' ? 'text-primary bg-primary/10' : ''}`}>Tree View</button>
+              <button onClick={handleFoldable} disabled={!validation.valid} className={`hover:text-primary px-2 py-0.5 rounded transition-colors whitespace-nowrap ${viewMode === 'foldable' ? 'text-primary bg-primary/10' : ''}`}>Tree View</button>
             </div>
           </div>
         </div>
 
         {/* Main Work Area */}
-        <div className="container mx-auto px-4 py-6 h-[calc(100vh-10rem)] min-h-[600px]">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+        <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 h-[calc(100vh-12rem)] sm:h-[calc(100vh-10rem)] min-h-[400px] sm:min-h-[600px]">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6 h-full">
 
             {/* LEFT PANEL: Input */}
-            <div className="flex flex-col gap-4 h-full">
-              <div className="flex-1 relative group rounded-xl border border-border/40 bg-card/20 backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-primary/20 hover:shadow-[0_0_20px_rgba(0,0,0,0.1)]">
+            <div className="flex flex-col gap-2 sm:gap-4 h-full">
+              <div className="flex-1 relative group rounded-xl border border-border/40 bg-card/20 backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-primary/20">
                 {/* Panel Header */}
-                <div className="absolute top-0 left-0 right-0 h-9 bg-muted/30 border-b border-border/20 flex items-center px-3 z-10">
-                  <div className="flex gap-1.5 mr-4">
-                    <div className="w-2.5 h-2.5 rounded-full bg-border/40 group-hover:bg-red-500/50 transition-colors"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-border/40 group-hover:bg-amber-500/50 transition-colors"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-border/40 group-hover:bg-emerald-500/50 transition-colors"></div>
+                <div className="absolute top-0 left-0 right-0 h-8 sm:h-9 bg-muted/30 border-b border-border/20 flex items-center px-2 sm:px-3 z-10">
+                  <div className="flex gap-1 sm:gap-1.5 mr-2 sm:mr-4">
+                    <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-border/40 transition-colors"></div>
+                    <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-border/40 transition-colors"></div>
+                    <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-border/40 transition-colors"></div>
                   </div>
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">Input.json</span>
+                  <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">Input.json</span>
                   <div className="ml-auto">
                     {!validation.valid && input && (
-                      <span className="flex items-center text-[10px] text-destructive bg-destructive/10 px-2 py-0.5 rounded-full animate-pulse">
-                        <Shield className="w-3 h-3 mr-1" /> Invalid Syntax
+                      <span className="flex items-center text-[9px] sm:text-[10px] text-destructive bg-destructive/10 px-1.5 sm:px-2 py-0.5 rounded-full">
+                        <Shield className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" /> <span className="hidden sm:inline">Invalid Syntax</span>
                       </span>
                     )}
                   </div>
                 </div>
 
-                <div className="pt-9 h-full">
+                <div className="pt-8 sm:pt-9 h-full">
                   <JsonEditor
                     value={input}
                     onChange={setInput}
                     label=""
                     onExtract={handleExtract}
                     placeholder="Paste JSON here..."
-                  // Assuming props allow className, otherwise wrapper handles it
                   />
                 </div>
               </div>
 
               {/* Second input for diff (Conditional) */}
               {(viewMode === "diff" || secondInput) && (
-                <div className="flex-1 relative rounded-xl border border-border/40 bg-card/20 backdrop-blur-sm overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
-                  <div className="absolute top-0 left-0 right-0 h-9 bg-amber-500/5 border-b border-amber-500/20 flex items-center px-3 z-10">
-                    <GitCompare className="w-3.5 h-3.5 text-amber-500 mr-2" />
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-amber-500 font-semibold">Comparison.json</span>
+                <div className="flex-1 relative rounded-xl border border-border/40 bg-card/20 backdrop-blur-sm overflow-hidden">
+                  <div className="absolute top-0 left-0 right-0 h-8 sm:h-9 bg-amber-500/5 border-b border-amber-500/20 flex items-center px-2 sm:px-3 z-10">
+                    <GitCompare className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-500 mr-1 sm:mr-2" />
+                    <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-amber-500 font-semibold">Comparison.json</span>
                   </div>
-                  <div className="pt-9 h-full">
+                  <div className="pt-8 sm:pt-9 h-full">
                     <JsonEditor
                       value={secondInput}
                       onChange={setSecondInput}
@@ -433,20 +430,20 @@ export default function Index() {
             <div className="flex flex-col h-full rounded-xl border border-border/40 bg-gradient-to-b from-card/30 to-background/50 backdrop-blur-md overflow-hidden shadow-2xl shadow-black/5">
 
               {/* Output Header */}
-              <div className="h-10 border-b border-border/40 bg-muted/20 flex items-center px-2 justify-between">
-                <div className="flex items-center gap-2 pl-2">
-                  <div className="p-1 rounded bg-primary/10">
-                    {viewMode === "formatted" && <Code className="w-3.5 h-3.5 text-primary" />}
-                    {viewMode === "diff" && <GitCompare className="w-3.5 h-3.5 text-amber-500" />}
-                    {viewMode === "table" && <Table className="w-3.5 h-3.5 text-blue-500" />}
-                    {viewMode === "types" && <FileCode className="w-3.5 h-3.5 text-purple-500" />}
-                    {viewMode === "foldable" && <Layers className="w-3.5 h-3.5 text-green-500" />}
-                    {viewMode === "query" && <Search className="w-3.5 h-3.5 text-pink-500" />}
-                    {viewMode === "analyze" && <BarChart3 className="w-3.5 h-3.5 text-indigo-500" />}
-                    {viewMode === "transform" && <Shuffle className="w-3.5 h-3.5 text-orange-500" />}
-                    {viewMode === "validate" && <Shield className="w-3.5 h-3.5 text-red-500" />}
+              <div className="h-8 sm:h-10 border-b border-border/40 bg-muted/20 flex items-center px-2 justify-between">
+                <div className="flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2">
+                  <div className="p-0.5 sm:p-1 rounded bg-primary/10">
+                    {viewMode === "formatted" && <Code className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />}
+                    {viewMode === "diff" && <GitCompare className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-500" />}
+                    {viewMode === "table" && <Table className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-500" />}
+                    {viewMode === "types" && <FileCode className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-purple-500" />}
+                    {viewMode === "foldable" && <Layers className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-green-500" />}
+                    {viewMode === "query" && <Search className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-pink-500" />}
+                    {viewMode === "analyze" && <BarChart3 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-indigo-500" />}
+                    {viewMode === "transform" && <Shuffle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-orange-500" />}
+                    {viewMode === "validate" && <Shield className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-500" />}
                   </div>
-                  <span className="text-xs font-semibold font-mono tracking-tight text-foreground/80">
+                  <span className="text-[10px] sm:text-xs font-semibold font-mono tracking-tight text-foreground/80">
                     {viewMode === "formatted" && "Output"}
                     {viewMode === "diff" && "Differences"}
                     {viewMode === "table" && "Table View"}
@@ -458,32 +455,32 @@ export default function Index() {
                     {viewMode === "validate" && "Validation Rules"}
                   </span>
                   {canonicalMode && viewMode === "formatted" && (
-                    <div className="px-1.5 py-0.5 rounded border border-primary/30 bg-primary/5 text-[10px] text-primary font-mono uppercase tracking-widest">Canonical</div>
+                    <div className="px-1 sm:px-1.5 py-0.5 rounded border border-primary/30 bg-primary/5 text-[8px] sm:text-[10px] text-primary font-mono uppercase tracking-widest">Canonical</div>
                   )}
                 </div>
 
                 <div className="flex bg-muted/50 p-0.5 rounded-lg border border-border/20">
                   <button
                     onClick={() => setViewMode("formatted")}
-                    className={`p-1.5 rounded-md transition-all ${viewMode === 'formatted' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                    className={`p-1 sm:p-1.5 rounded-md transition-all ${viewMode === 'formatted' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
                     title="Code View"
                   >
-                    <Code className="w-3.5 h-3.5" />
+                    <Code className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   </button>
                   <button
                     onClick={() => output && setViewMode("foldable")}
                     disabled={!output}
-                    className={`p-1.5 rounded-md transition-all ${viewMode === 'foldable' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground disabled:opacity-30'}`}
+                    className={`p-1 sm:p-1.5 rounded-md transition-all ${viewMode === 'foldable' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground disabled:opacity-30'}`}
                     title="Tree View"
                   >
-                    <Layers className="w-3.5 h-3.5" />
+                    <Layers className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   </button>
                   <button
                     onClick={() => setViewMode("table")}
-                    className={`p-1.5 rounded-md transition-all ${viewMode === 'table' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                    className={`p-1 sm:p-1.5 rounded-md transition-all ${viewMode === 'table' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
                     title="Table View"
                   >
-                    <Table className="w-3.5 h-3.5" />
+                    <Table className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   </button>
                 </div>
               </div>
@@ -492,17 +489,17 @@ export default function Index() {
               <div className="flex-1 overflow-hidden relative">
                 {viewMode === "formatted" && (
                   output ? (
-                    <div className="h-full overflow-auto scrollbar-thin scrollbar-thumb-border/50 p-4">
-                      <pre className="font-mono text-xs md:text-sm leading-relaxed text-foreground/90" dangerouslySetInnerHTML={{ __html: highlightJson(output) }} />
+                    <div className="h-full overflow-auto scrollbar-thin scrollbar-thumb-border/50 p-2 sm:p-4">
+                      <pre className="font-mono text-xs leading-relaxed text-foreground/90" dangerouslySetInnerHTML={{ __html: highlightJson(output) }} />
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-muted-foreground/40 gap-4">
+                    <div className="flex flex-col items-center justify-center h-full text-muted-foreground/40 gap-2 sm:gap-4 p-4">
                       <div className="relative">
                         <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full"></div>
-                        <Code className="w-12 h-12 relative z-10" />
+                        <Code className="w-8 h-8 sm:w-12 sm:h-12 relative z-10" />
                       </div>
                       <div className="text-center space-y-1">
-                        <p className="text-sm font-medium text-foreground/60">Ready to process</p>
+                        <p className="text-xs sm:text-sm font-medium text-foreground/60">Ready to process</p>
                         <p className="text-xs font-mono">Output will appear here</p>
                       </div>
                     </div>

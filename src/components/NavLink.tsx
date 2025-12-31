@@ -13,8 +13,7 @@ export function NavLink({ to, children, className }: NavLinkProps) {
       to={to}
       className={({ isActive }) =>
         cn(
-          "px-4 py-2 text-sm font-medium transition-all duration-200 rounded-lg relative overflow-hidden",
-          "hover:-translate-y-0.5 active:translate-y-0",
+          "px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-colors duration-200 rounded-lg whitespace-nowrap",
           isActive 
             ? "text-foreground bg-primary/10 shadow-sm" 
             : "text-muted-foreground hover:text-foreground hover:bg-accent/50",
