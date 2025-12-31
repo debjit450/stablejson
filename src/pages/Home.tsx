@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/Layout";
+import { ViewCounter } from "@/components/ViewCounter";
 import { Link } from "react-router-dom";
 import {
   CheckCircle2,
@@ -16,133 +17,143 @@ import {
   Sparkles,
   Github,
   ExternalLink,
-  Code2,
-  Terminal,
   Cpu,
   Zap,
   Lock,
   Layers,
+  Code2,
+  Terminal,
+  LucideLayers,
+  CurlyBraces,
 } from "lucide-react";
 
 export default function Home() {
   const features = [
-    { icon: CheckCircle2, text: "Validate and format", description: "Instantly validate JSON syntax and format with proper indentation" },
-    { icon: Eraser, text: "Clean null and empty values", description: "Remove null, undefined, and empty values to clean up your data" },
-    { icon: GitCompare, text: "Compare and diff", description: "Side-by-side comparison with highlighted differences" },
-    { icon: FileSearch, text: "Inspect and extract paths", description: "Navigate JSON structure and extract specific data paths" },
-    { icon: FileCode, text: "Generate types", description: "Auto-generate TypeScript interfaces and Zod schemas" },
-    { icon: Binary, text: "Canonical output", description: "Deterministic JSON output for consistent hashing and comparison" },
-    { icon: Search, text: "JSONPath queries", description: "Query JSON data using JSONPath expressions" },
-    { icon: BarChart3, text: "Analyze structure", description: "Get insights into JSON structure, size, and data types" },
-    { icon: Shuffle, text: "Transform data", description: "Transform, flatten, and manipulate JSON structure" },
-    { icon: Shield, text: "Custom validation", description: "Validate JSON against custom rules and schemas" },
+    { icon: CheckCircle2, text: "Validate & Format", description: "Instantly fix JSON syntax with perfect indentation." },
+    { icon: Eraser, text: "Sanitize Data", description: "Prune nulls, undefined, and empty values automatically." },
+    { icon: GitCompare, text: "Smart Diff", description: "Visual side-by-side comparison with high-contrast diffing." },
+    { icon: FileSearch, text: "Path Explorer", description: "Navigate structure and extract precise JSONPaths." },
+    { icon: FileCode, text: "Type Generator", description: "One-click TypeScript interfaces and Zod schemas." },
+    { icon: Binary, text: "Deterministic", description: "Canonical output for consistent hashing and storage." },
+    { icon: Search, text: "Query Engine", description: "Filter deeply nested data using JSONPath expressions." },
+    { icon: BarChart3, text: "Deep Analysis", description: "Visualize structure depth, node counts, and data size." },
+    { icon: Shuffle, text: "Transform", description: "Flatten, unflatten, or remap structures on the fly." },
   ];
 
   const principles = [
     {
-      title: "Local-First",
-      description: "All formatting and validation run entirely in your browser. Nothing is sent anywhere.",
+      title: "Local-First Architecture",
+      description: "Zero latency. Zero data leakage. All processing happens in your browser's memory.",
       icon: Shield,
     },
     {
       title: "Deterministic Output",
-      description: "The same JSON input always produces the same output, with stable key ordering.",
-      icon: CheckCircle2,
-    },
-    {
-      title: "Fast & Lightweight",
-      description: "Minimal bundle, minimal dependencies, and instant feedback—even for large files.",
+      description: "Stable key sorting ensures that the same input always yields the exact same output hash.",
       icon: Binary,
     },
     {
-      title: "Copy-Friendly",
-      description: "Clean, stable formatting designed for copying into codebases, configs, and reviews.",
-      icon: FileCode,
+      title: "Developer Experience",
+      description: "Built for copy-pasting. Clean output ready for your codebase, config files, or PRs.",
+      icon: Terminal,
     },
   ];
 
   return (
     <Layout>
+      {/* Dynamic Font Loading */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         
-        .font-display { font-family: 'Syne', sans-serif; }
-        .font-mono-alt { font-family: 'Space Mono', monospace; }
-        .font-code { font-family: 'JetBrains Mono', monospace; }
+        :root {
+          --font-display: 'Plus Jakarta Sans', sans-serif;
+          --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        .font-display { font-family: var(--font-display); }
+        .font-code { font-family: var(--font-mono); }
+        
+        .hero-glow {
+          background: radial-gradient(circle at center, hsl(var(--primary) / 0.15) 0%, transparent 70%);
+        }
+        
+        .grid-bg {
+          background-size: 40px 40px;
+          background-image: linear-gradient(to right, hsl(var(--border) / 0.3) 1px, transparent 1px),
+                            linear-gradient(to bottom, hsl(var(--border) / 0.3) 1px, transparent 1px);
+          mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+        }
       `}</style>
+
       {/* Hero Section */}
-      <section className="relative pt-16 pb-16 sm:pt-24 sm:pb-24 lg:pt-32 lg:pb-32">
+      <section className="relative overflow-hidden pt-24 pb-20 sm:pt-32 sm:pb-32">
+        {/* Background Elements */}
+        <div className="absolute inset-0 grid-bg pointer-events-none -z-10" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] hero-glow blur-3xl -z-10" />
+
         <div className="container mx-auto px-4 max-w-6xl relative">
-          <div className="text-center flex flex-col items-center">
+          <div className="flex flex-col items-center text-center">
 
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 sm:gap-3 px-3 py-2 sm:px-5 sm:py-2 rounded-full mb-6 sm:mb-10 bg-foreground/5 border border-border">
-              <Cpu className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
-              <span className="font-code text-xs tracking-wider text-muted-foreground uppercase">
-                Next-Gen JSON Processing
+            <div className="group relative inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-background/50 border border-border/50 backdrop-blur-sm shadow-sm transition-all hover:border-primary/30 mb-8 cursor-default">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
+              <span className="font-code text-xs font-medium tracking-wide text-muted-foreground group-hover:text-foreground transition-colors uppercase">
+                v1.0.0 Now Available
+              </span>
             </div>
 
-            {/* Hero Title */}
-            <h1 className="font-display text-3xl sm:text-5xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-6 sm:mb-8 leading-[1.1]">
-              <span className="block text-foreground">
-                Work with
-              </span>
-              <span className="block mt-1 sm:mt-2 relative">
-                <span className="font-code text-foreground relative inline-block">
-                  &lt;JSON/&gt;
-                </span>
-              </span>
-              <span className="block mt-1 sm:mt-2 text-muted-foreground">
-                like never before
+            {/* Main Title */}
+            <h1 className="font-display text-5xl sm:text-7xl lg:text-8xl font-extrabold tracking-tight mb-8 text-foreground leading-[1.1]">
+              Engineered for <br className="hidden sm:block" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-foreground via-foreground/80 to-muted-foreground">
+                JSON Perfection
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 sm:mb-12 leading-relaxed font-light px-4">
-              A <span className="text-foreground font-medium">hyper-fast</span>, <span className="text-foreground/80 font-medium">zero-trust</span> JSON utility.
-              Everything runs <span className="text-foreground/90 font-medium">locally</span> in your browser—no servers, no tracking, no compromises.
+            <p className="font-display text-lg sm:text-xl text-muted-foreground/80 max-w-2xl mx-auto mb-10 leading-relaxed">
+              The privacy-first JSON processor. Validate, format, and generate types directly in your browser.
+              <span className="hidden sm:inline"> No servers. No tracking. Just code.</span>
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-20 w-full sm:w-auto px-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
               <Button
                 asChild
-                className="w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-10 rounded-xl font-display font-bold text-sm sm:text-base tracking-tight bg-foreground text-background hover:bg-foreground/90 border border-foreground/20"
+                className="w-full sm:w-auto h-14 px-8 rounded-full font-display font-bold text-base bg-foreground text-background hover:bg-foreground/90 shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)] dark:shadow-[0_0_20px_-5px_rgba(255,255,255,0.1)] transition-all hover:scale-105"
               >
                 <Link to="/app">
-                  <span className="flex items-center">
-                    Launch Processor
-                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
-                  </span>
+                  Open Processor
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
               </Button>
 
               <Button
                 variant="outline"
                 asChild
-                className="w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-10 rounded-xl font-display font-semibold text-sm sm:text-base tracking-tight border-2 border-foreground/20 bg-foreground/5 hover:bg-foreground/10 hover:border-foreground/30 text-muted-foreground hover:text-foreground"
+                className="w-full sm:w-auto h-14 px-8 rounded-full font-display font-semibold text-base border-border/50 bg-background/50 backdrop-blur-sm hover:bg-foreground/5 transition-all"
               >
                 <a href="https://github.com/debjit450/stablejson" target="_blank" rel="noopener noreferrer">
-                  <Github className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                  View Source
+                  <Github className="w-5 h-5 mr-2" />
+                  Star on GitHub
                 </a>
               </Button>
             </div>
 
-            {/* Tech Badges */}
-            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 font-code text-xs text-muted-foreground border-t border-border pt-6 sm:pt-10 px-4 w-full max-w-4xl">
-              <div className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-lg bg-foreground/5 border border-border">
-                <Lock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
-                <span className="text-muted-foreground text-xs">100% Local</span>
+            {/* Stats/Tech Stack */}
+            <div className="mt-16 pt-8 border-t border-border/30 w-full max-w-3xl flex flex-wrap justify-center gap-x-8 gap-y-4">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Lock className="w-4 h-4" />
+                <span className="text-sm font-medium">100% Local</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-lg bg-foreground/5 border border-border">
-                <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
-                <span className="text-muted-foreground text-xs">Lightning Fast</span>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Zap className="w-4 h-4" />
+                <span className="text-sm font-medium">Ligthning Fast</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-lg bg-foreground/5 border border-border">
-                <Layers className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
-                <span className="text-muted-foreground text-xs">Zero Dependencies</span>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <LucideLayers className="w-4 h-4" />
+                <span className="text-sm font-medium">Zero Dependencies</span>
               </div>
             </div>
           </div>
@@ -150,181 +161,162 @@ export default function Home() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-16 sm:py-20 lg:py-28 relative">
+      <section className="py-24 relative bg-foreground/[0.02]">
         <div className="container mx-auto px-4 max-w-7xl">
-          <div className="text-center mb-12 sm:mb-16 lg:mb-20">
-            <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 tracking-tight text-foreground">
-              Full-Spectrum <span className="text-muted-foreground">JSON</span> Toolkit
+          <div className="mb-16 md:mb-24">
+            <h2 className="font-display text-3xl md:text-5xl font-bold mb-6 text-foreground tracking-tight">
+              Everything you need. <br />
+              <span className="text-muted-foreground">Nothing you don't.</span>
             </h2>
-            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto font-light px-4">
-              From validation to transformation, every tool you need in one place.
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {features.map(({ icon: Icon, text, description }, index) => {
-              const cardClasses = [
-                "relative p-4 sm:p-6 rounded-2xl bg-foreground/5 border border-border hover:bg-foreground/10 transition-colors duration-300 cursor-pointer",
-                index % 3 === 0 ? "card-brand" : "",
-                index % 3 === 1 ? "card-info" : "",
-                index % 3 === 2 ? "card-accent-secondary" : "",
-              ].filter(Boolean).join(" ");
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map(({ icon: Icon, text, description }, i) => (
+              <div
+                key={text}
+                className="group relative p-8 rounded-3xl bg-background border border-border/50 hover:border-foreground/20 transition-all duration-300 hover:shadow-xl hover:shadow-foreground/5 hover:-translate-y-1 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-foreground/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-              return (
-                <div
-                  key={text}
-                  className={cardClasses}
-                >
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    {/* Icon */}
-                    <div className="shrink-0 p-2 sm:p-3 rounded-xl bg-foreground/10 border border-border">
-                      <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
-                    </div>
-
-                    <div className="pt-1 flex-1">
-                      <h3 className="font-display font-semibold text-sm sm:text-base text-foreground mb-2 tracking-tight">
-                        {text}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-light">
-                        {description}
-                      </p>
-                    </div>
+                <div className="relative z-10">
+                  <div className="w-12 h-12 rounded-2xl bg-foreground/5 flex items-center justify-center mb-6 group-hover:bg-foreground group-hover:text-background transition-colors duration-300">
+                    <Icon className="w-6 h-6" />
                   </div>
-                </div>
-              );
-            })}
-          </div>
-          </div>
-      </section>
-      {/* Philosophy Section */}
-      <section className="py-16 sm:py-20 lg:py-28 relative">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[2px] bg-gradient-to-r from-transparent via-border to-transparent" />
-
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
-            <div className="lg:col-span-5 space-y-6 sm:space-y-8">
-              <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
-                <span className="block text-foreground">Built on</span>
-                <span className="block text-muted-foreground">
-                  Engineering Truth
-                </span>
-              </h2>
-
-              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed font-light">
-                No analytics. No telemetry. No cloud processing. Just pure, deterministic JSON operations running at browser speed.
-              </p>
-
-              {/* Code Block */}
-              <div className="hidden lg:block relative">
-                <div className="relative p-4 sm:p-6 bg-background/90 border border-border rounded-2xl font-code text-xs sm:text-sm overflow-hidden">
-                  <code className="block relative z-10">
-                    <span className="text-muted-foreground">const</span> <span className="text-foreground/80">config</span> <span className="text-muted-foreground">=</span> <span className="text-muted-foreground">{"{"}</span>{"\n"}
-                    <span className="text-muted-foreground/70">  // Privacy-first architecture</span>{"\n"}
-                    {"  "}<span className="text-muted-foreground">"privacy"</span><span className="text-muted-foreground">:</span> <span className="text-foreground">true</span><span className="text-muted-foreground">,</span>{"\n"}
-                    {"  "}<span className="text-muted-foreground">"offline"</span><span className="text-muted-foreground">:</span> <span className="text-foreground">true</span><span className="text-muted-foreground">,</span>{"\n"}
-                    {"  "}<span className="text-muted-foreground">"tracking"</span><span className="text-muted-foreground">:</span> <span className="text-muted-foreground/70">null</span><span className="text-muted-foreground">,</span>{"\n"}
-                    {"  "}<span className="text-muted-foreground">"speed"</span><span className="text-muted-foreground">:</span> <span className="text-foreground/80">"blazing"</span>{"\n"}
-                    <span className="text-muted-foreground">{"}"}</span><span className="text-muted-foreground">;</span>
-                  </code>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-              {principles.map(({ title, description, icon: Icon }, index) => (
-                <div
-                  key={title}
-                  className="p-5 sm:p-7 rounded-2xl bg-foreground/5 border border-border hover:bg-foreground/10 transition-colors duration-300 cursor-pointer"
-                >
-                  <div className="mb-4 sm:mb-5 p-2 sm:p-3 rounded-xl bg-foreground/10 border border-border inline-block">
-                    <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground" />
-                  </div>
-
-                  <h3 className="font-display text-lg sm:text-xl font-bold text-foreground mb-2 sm:mb-3 tracking-tight">
-                    {title}
-                  </h3>
-
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-light">
+                  <h3 className="font-display text-lg font-bold mb-3 text-foreground">{text}</h3>
+                  <p className="text-muted-foreground leading-relaxed text-sm font-medium">
                     {description}
                   </p>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 sm:py-24 lg:py-32 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-foreground/[0.02] to-transparent" />
+      {/* Philosophy / Technical Section */}
+      <section className="py-24 lg:py-32 relative overflow-hidden">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
-        <div className="container mx-auto px-4 max-w-4xl text-center relative z-10">
-          <div className="space-y-6 sm:space-y-10">
-            {/* Central Icon */}
-            <div className="relative inline-block">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-foreground/10 border-2 border-border flex items-center justify-center">
-                <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground" />
+            {/* Text Content */}
+            <div className="space-y-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-xs font-bold uppercase tracking-wider">
+                <Layers className="w-3 h-3" />
+                Philosophy
+              </div>
+
+              <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
+                Built on Engineering <br />
+                <span className="text-muted-foreground">Truths.</span>
+              </h2>
+
+              <div className="space-y-6">
+                {principles.map((item) => (
+                  <div key={item.title} className="flex gap-4">
+                    <div className="shrink-0 mt-1">
+                      <div className="w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center border border-border/50">
+                        <item.icon className="w-5 h-5 text-foreground/70" />
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="font-display text-lg font-bold text-foreground mb-1">{item.title}</h3>
+                      <p className="text-muted-foreground leading-relaxed text-sm">{item.description}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
-              <span className="block text-foreground">
-                Ready to process JSON
-              </span>
-              <span className="block mt-1 sm:mt-2 text-muted-foreground">
-                at the speed of thought?
-              </span>
-            </h2>
+            {/* Visual Code Block */}
+            <div className="relative lg:pl-10">
+              <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-[2.5rem] blur-2xl opacity-50" />
+              <div className="relative rounded-2xl bg-[#09090b] border border-white/10 shadow-2xl overflow-hidden">
+                {/* Window Controls */}
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/5">
+                  <div className="w-3 h-3 rounded-full bg-red-500/50" />
+                  <div className="w-3 h-3 rounded-full bg-amber-500/50" />
+                  <div className="w-3 h-3 rounded-full bg-emerald-500/50" />
+                  <div className="ml-auto font-code text-[10px] text-white/30">config.json</div>
+                </div>
+                {/* Code */}
+                <div className="p-6 font-code text-sm sm:text-base overflow-x-auto">
+                  <pre className="leading-relaxed">
+                    <code>
+                      <span className="text-purple-400">const</span> <span className="text-blue-400">manifest</span> <span className="text-white/60">=</span> <span className="text-yellow-400">{"{"}</span>{"\n"}
+                      {"  "}<span className="text-green-400">"privacy"</span><span className="text-white/60">:</span> <span className="text-orange-400">true</span><span className="text-white/60">,</span>{"\n"}
+                      {"  "}<span className="text-green-400">"telemetry"</span><span className="text-white/60">:</span> <span className="text-red-400">null</span><span className="text-white/60">,</span>{"\n"}
+                      {"  "}<span className="text-green-400">"features"</span><span className="text-white/60">:</span> <span className="text-yellow-400">{"["}</span>{"\n"}
+                      {"    "}<span className="text-cyan-400">"Validate"</span><span className="text-white/60">,</span>{"\n"}
+                      {"    "}<span className="text-cyan-400">"Format"</span><span className="text-white/60">,</span>{"\n"}
+                      {"    "}<span className="text-cyan-400">"Type Gen"</span>{"\n"}
+                      {"  "}<span className="text-yellow-400">{"]"}</span>{"\n"}
+                      <span className="text-yellow-400">{"}"}</span><span className="text-white/60">;</span>
+                    </code>
+                  </pre>
+                </div>
+              </div>
+            </div>
 
-            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed px-4">
-              Join developers who demand privacy, speed, and precision. No signup, no tracking, no BS.
-            </p>
+          </div>
+        </div>
+      </section>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5 pt-4 px-4">
-              <Button
-                asChild
-                size="lg"
-                className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-12 rounded-xl font-display font-bold text-sm sm:text-base tracking-tight bg-foreground text-background hover:bg-foreground/90 border border-foreground/20"
-              >
-                <Link to="/app">
-                  <span className="flex items-center">
-                    Start Processing
-                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
-                  </span>
-                </Link>
-              </Button>
+      {/* Large CTA Section */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-foreground text-background" />
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
 
-              <Button
-                variant="ghost"
-                size="lg"
-                asChild
-                className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-12 rounded-xl font-display font-semibold text-sm sm:text-base tracking-tight text-muted-foreground hover:text-foreground hover:bg-foreground/5"
-              >
-                <Link to="/about">
-                  Learn More
-                  <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
-                </Link>
-              </Button>
+        <div className="container mx-auto px-4 max-w-4xl relative z-10 text-center">
+          <div className="mb-8 flex justify-center">
+            <div className="p-4 rounded-2xl bg-background/10 backdrop-blur-sm border border-background/20">
+              <Sparkles className="w-8 h-8 text-background" />
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Footer */}
-      <section className="py-12 sm:py-16 border-t border-border bg-background/40 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+          <h2 className="font-display text-4xl sm:text-6xl font-bold mb-6 text-background tracking-tight">
+            Ready to clean up your data?
+          </h2>
+          <p className="text-background/80 text-lg sm:text-xl max-w-2xl mx-auto mb-10 font-medium">
+            Join thousands of developers using the fastest, most secure JSON tool on the web.
+          </p>
 
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <blockquote className="font-code text-sm sm:text-base lg:text-lg text-muted-foreground font-medium italic mb-4 sm:mb-6">
-            "The best tool is the one you can trust."
-          </blockquote>
-
-          <div className="flex justify-center">
-            <div className="w-12 h-[2px] bg-gradient-to-r from-transparent via-border to-transparent" />
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button
+              asChild
+              size="lg"
+              className="w-full sm:w-auto h-14 px-10 rounded-full font-display font-bold text-foreground bg-background hover:bg-background/90 border-0"
+            >
+              <Link to="/app">
+                Launch Processor
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              asChild
+              className="w-full sm:w-auto h-14 px-10 rounded-full font-display font-bold text-dark border-background/30 hover:bg-background/10 hover:text-white hover:border-background/50"
+            >
+              <Link to="/about">
+                How it works
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
+
+      {/* Minimal Footer */}
+      <footer className="py-12 border-t border-border/40 bg-background">
+        <div className="container mx-auto px-4 flex flex-col items-center">
+          <div className="flex items-center gap-2 mb-4 opacity-50">
+            <CurlyBraces className="w-5 h-5" />
+            <span className="font-display font-bold">StableJSON</span>
+          </div>
+          <p className="text-muted-foreground text-sm text-center max-w-md">
+            Built for the community. Open source and free forever.
+          </p>
+        </div>
+      </footer>
     </Layout>
   );
 }
