@@ -3,6 +3,22 @@
  * Version 1.5.0 - Enhanced performance features
  */
 
+type JsonWorkerPayload = string | { value: unknown; space?: string | number };
+
+interface JsonWorkerMessage {
+  id: string;
+  success: boolean;
+  result?: unknown;
+  error?: string;
+}
+
+export interface PerformanceMetrics {
+  avg: number;
+  min: number;
+  max: number;
+  count: number;
+}
+
 // Web Worker for heavy JSON processing
 export class JsonWorker {
   private worker: Worker | null = null;
@@ -55,22 +71,23 @@ export class JsonWorker {
     }
   }
   
-  async processJson(type: string, data: any): Promise<any> {
+  async processJson<T = unknown>(type: string, data: JsonWorkerPayload): Promise<T> {
     if (!this.worker) {
       // Fallback to main thread
-      return this.fallbackProcess(type, data);
+      return this.fallbackProcess<T>(type, data);
     }
     
     return new Promise((resolve, reject) => {
       const id = Math.random().toString(36).substr(2, 9);
       
       const handleMessage = (e: MessageEvent) => {
-        if (e.data.id === id) {
+        const message = e.data as JsonWorkerMessage;
+        if (message.id === id) {
           this.worker!.removeEventListener('message', handleMessage);
-          if (e.data.success) {
-            resolve(e.data.result);
+          if (message.success) {
+            resolve(message.result as T);
           } else {
-            reject(new Error(e.data.error));
+            reject(new Error(message.error));
           }
         }
       };
@@ -86,19 +103,23 @@ export class JsonWorker {
     });
   }
   
-  private fallbackProcess(type: string, data: any): any {
+  private fallbackProcess<T = unknown>(type: string, data: JsonWorkerPayload): T {
     switch (type) {
       case 'parse':
-        return JSON.parse(data);
+        return JSON.parse(data as string) as T;
       case 'stringify':
-        return JSON.stringify(data.value, null, data.space);
+        return JSON.stringify(
+          (data as { value: unknown; space?: string | number }).value,
+          null,
+          (data as { value: unknown; space?: string | number }).space,
+        ) as T;
       case 'format':
-        return JSON.stringify(JSON.parse(data), null, 2);
+        return JSON.stringify(JSON.parse(data as string), null, 2) as T;
       case 'minify':
-        return JSON.stringify(JSON.parse(data));
+        return JSON.stringify(JSON.parse(data as string)) as T;
       case 'validate':
-        JSON.parse(data);
-        return { valid: true };
+        JSON.parse(data as string);
+        return { valid: true } as T;
       default:
         throw new Error('Unknown operation');
     }
@@ -119,7 +140,7 @@ export class StreamingJsonParser {
   private inString = false;
   private escaped = false;
   
-  parseChunk(chunk: string, onObject?: (obj: any) => void): void {
+  parseChunk(chunk: string, onObject?: (obj: unknown) => void): void {
     this.buffer += chunk;
     
     let i = 0;
@@ -152,7 +173,7 @@ export class StreamingJsonParser {
             // Complete object found
             const objectStr = this.buffer.substring(0, i + 1);
             try {
-              const obj = JSON.parse(objectStr);
+              const obj = JSON.parse(objectStr) as unknown;
               onObject?.(obj);
             } catch (e) {
               // Invalid JSON, continue
@@ -188,7 +209,7 @@ export class MemoryEfficientJson {
       // Small JSON, process normally
       const worker = new JsonWorker();
       try {
-        return await worker.processJson(operation, json);
+        return await worker.processJson<string>(operation, json);
       } finally {
         worker.terminate();
       }
@@ -196,7 +217,7 @@ export class MemoryEfficientJson {
     
     // Large JSON, use streaming approach
     const parser = new StreamingJsonParser();
-    const results: any[] = [];
+    const results: unknown[] = [];
     
     for (let i = 0; i < json.length; i += chunkSize) {
       const chunk = json.substring(i, i + chunkSize);
@@ -209,7 +230,7 @@ export class MemoryEfficientJson {
     const remaining = parser.flush();
     if (remaining.trim()) {
       try {
-        results.push(JSON.parse(remaining));
+        results.push(JSON.parse(remaining) as unknown);
       } catch (e) {
         // Ignore invalid remaining JSON
       }
@@ -248,7 +269,7 @@ export class PerformanceMonitor {
     };
   }
   
-  static getMetrics(operation: string) {
+  static getMetrics(operation: string): PerformanceMetrics | null {
     const times = this.metrics.get(operation) || [];
     if (times.length === 0) return null;
     
@@ -259,8 +280,8 @@ export class PerformanceMonitor {
     return { avg, min, max, count: times.length };
   }
   
-  static getAllMetrics() {
-    const result: Record<string, any> = {};
+  static getAllMetrics(): Record<string, PerformanceMetrics | null> {
+    const result: Record<string, PerformanceMetrics | null> = {};
     
     for (const [operation, times] of this.metrics.entries()) {
       result[operation] = this.getMetrics(operation);
@@ -275,26 +296,26 @@ export class PerformanceMonitor {
 }
 
 // Debounced processing for real-time editing
-export function debounce<T extends (...args: any[]) => any>(
-  func: T,
+export function debounce<Args extends unknown[]>(
+  func: (...args: Args) => unknown,
   wait: number
-): (...args: Parameters<T>) => void {
+): (...args: Args) => void {
   let timeout: NodeJS.Timeout;
   
-  return (...args: Parameters<T>) => {
+  return (...args: Args) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
   };
 }
 
 // Throttled processing for continuous operations
-export function throttle<T extends (...args: any[]) => any>(
-  func: T,
+export function throttle<Args extends unknown[]>(
+  func: (...args: Args) => unknown,
   limit: number
-): (...args: Parameters<T>) => void {
+): (...args: Args) => void {
   let inThrottle: boolean;
   
-  return (...args: Parameters<T>) => {
+  return (...args: Args) => {
     if (!inThrottle) {
       func(...args);
       inThrottle = true;

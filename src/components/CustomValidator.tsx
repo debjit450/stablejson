@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { JsonValue, isJsonObject } from '@/lib/jsonTypes';
 
 interface ValidationRule {
   id: string;
@@ -55,7 +56,7 @@ interface ValidationError {
   path: string;
   message: string;
   severity: 'error' | 'warning' | 'info';
-  value?: any;
+  value?: JsonValue;
 }
 
 interface CustomValidatorProps {
@@ -116,20 +117,20 @@ export function CustomValidator({ json }: CustomValidatorProps) {
   const { toast } = useToast();
 
   // Parse JSON safely
-  const parsedJson = useMemo(() => {
+  const parsedJson = useMemo<JsonValue | null>(() => {
     try {
-      return JSON.parse(json);
+      return JSON.parse(json) as JsonValue;
     } catch {
       return null;
     }
   }, [json]);
 
   // Get value at JSONPath
-  const getValueAtPath = useCallback((obj: any, path: string): any => {
+  const getValueAtPath = useCallback((obj: JsonValue, path: string): JsonValue | undefined => {
     if (path === '$' || path === '$.') return obj;
     
     const parts = path.replace(/^\$\.?/, '').split('.');
-    let current = obj;
+    let current: JsonValue | undefined = obj;
     
     for (const part of parts) {
       if (current === null || current === undefined) return undefined;
@@ -139,12 +140,14 @@ export function CustomValidator({ json }: CustomValidatorProps) {
         const [key, indexStr] = part.split('[');
         const index = parseInt(indexStr.replace(']', ''));
         
-        if (key) current = current[key];
+        if (key && isJsonObject(current)) current = current[key];
         if (Array.isArray(current) && !isNaN(index)) {
           current = current[index];
         }
-      } else {
+      } else if (isJsonObject(current)) {
         current = current[part];
+      } else {
+        return undefined;
       }
     }
     
@@ -152,7 +155,7 @@ export function CustomValidator({ json }: CustomValidatorProps) {
   }, []);
 
   // Validate a single rule
-  const validateRule = useCallback((rule: ValidationRule, data: any): ValidationError | null => {
+  const validateRule = useCallback((rule: ValidationRule, data: JsonValue): ValidationError | null => {
     if (!rule.enabled) return null;
     
     const value = getValueAtPath(data, rule.path);
@@ -238,7 +241,7 @@ export function CustomValidator({ json }: CustomValidatorProps) {
       case 'format':
         if (value !== undefined && value !== null) {
           const formats = {
-            email: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+            email: /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/,
             url: /^https?:\/\/.+/,
             uuid: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
             date: /^\d{4}-\d{2}-\d{2}$/,
@@ -636,7 +639,7 @@ export function CustomValidator({ json }: CustomValidatorProps) {
                       </div>
                       <div>
                         <Label htmlFor="rule-type">Rule Type</Label>
-                        <Select value={newRule.type} onValueChange={(value) => setNewRule({ ...newRule, type: value as any })}>
+                        <Select value={newRule.type} onValueChange={(value) => setNewRule({ ...newRule, type: value as ValidationRule['type'] })}>
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
@@ -673,7 +676,7 @@ export function CustomValidator({ json }: CustomValidatorProps) {
                       </div>
                       <div>
                         <Label htmlFor="rule-severity">Severity</Label>
-                        <Select value={newRule.severity} onValueChange={(value) => setNewRule({ ...newRule, severity: value as any })}>
+                        <Select value={newRule.severity} onValueChange={(value) => setNewRule({ ...newRule, severity: value as ValidationRule['severity'] })}>
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>

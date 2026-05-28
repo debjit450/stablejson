@@ -25,9 +25,9 @@ export function JsonValidator({ json }: JsonValidatorProps) {
   };
 
   const updateRule = (index: number, field: keyof ValidationRule, value: string | boolean | number) => {
-    const newRules = [...rules];
-    (newRules[index] as Record<string, unknown>)[field] = value;
-    setRules(newRules);
+    setRules(rules.map((rule, ruleIndex) => (
+      ruleIndex === index ? { ...rule, [field]: value } : rule
+    )));
   };
 
   const validate = () => {

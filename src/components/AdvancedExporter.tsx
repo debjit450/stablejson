@@ -23,8 +23,9 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { JsonValue, isJsonObject } from '@/lib/jsonTypes';
 import * as yaml from 'js-yaml';
-import { Parser as XMLParser, Builder as XMLBuilder } from 'xml2js';
+import { Builder as XMLBuilder } from 'xml2js';
 import Papa from 'papaparse';
 import { saveAs } from 'file-saver';
 
@@ -151,9 +152,9 @@ export function AdvancedExporter({ json, filename = 'export' }: AdvancedExporter
   const { toast } = useToast();
 
   // Parse JSON safely
-  const parsedJson = React.useMemo(() => {
+  const parsedJson = React.useMemo<JsonValue | null>(() => {
     try {
-      return JSON.parse(json);
+      return JSON.parse(json) as JsonValue;
     } catch {
       return null;
     }
@@ -181,7 +182,7 @@ export function AdvancedExporter({ json, filename = 'export' }: AdvancedExporter
   }, [parsedJson, options]);
 
   // Convert to format
-  const convertToFormat = useCallback(async (data: any, opts: ExportOptions): Promise<string> => {
+  const convertToFormat = useCallback(async (data: JsonValue, opts: ExportOptions): Promise<string> => {
     switch (opts.format) {
       case 'json':
         return JSON.stringify(data, null, opts.indent);
@@ -193,17 +194,21 @@ export function AdvancedExporter({ json, filename = 'export' }: AdvancedExporter
           noRefs: true,
         });
 
-      case 'xml':
+      case 'xml': {
         const builder = new XMLBuilder({
-          format: true,
-          indentBy: ' '.repeat(opts.indent),
-          suppressEmptyNode: true,
+          renderOpts: {
+            pretty: true,
+            indent: ' '.repeat(opts.indent),
+            newline: '\n',
+          },
+          headless: true,
         });
         const xmlData = { [opts.xmlRootElement || 'root']: data };
-        return builder.build(xmlData);
+        return builder.buildObject(xmlData);
+      }
 
       case 'csv':
-      case 'tsv':
+      case 'tsv': {
         const delimiter = opts.format === 'tsv' ? '\t' : (opts.customDelimiter || ',');
         
         if (Array.isArray(data)) {
@@ -213,7 +218,7 @@ export function AdvancedExporter({ json, filename = 'export' }: AdvancedExporter
             quoteChar: '"',
             quotes: opts.csvQuoteAll,
           });
-        } else {
+        } else if (isJsonObject(data)) {
           // Convert object to array of key-value pairs
           const kvPairs = Object.entries(data).map(([key, value]) => ({
             key,
@@ -226,6 +231,14 @@ export function AdvancedExporter({ json, filename = 'export' }: AdvancedExporter
             quotes: opts.csvQuoteAll,
           });
         }
+
+        return Papa.unparse([{ value: data === null ? '' : String(data) }], {
+          delimiter,
+          header: opts.csvHeaders,
+          quoteChar: '"',
+          quotes: opts.csvQuoteAll,
+        });
+      }
 
       case 'toml':
         return convertToTOML(data, opts);
@@ -242,10 +255,10 @@ export function AdvancedExporter({ json, filename = 'export' }: AdvancedExporter
   }, []);
 
   // TOML converter
-  const convertToTOML = (data: any, opts: ExportOptions): string => {
+  const convertToTOML = (data: JsonValue, opts: ExportOptions): string => {
     const lines: string[] = [];
     
-    const convertValue = (value: any): string => {
+    const convertValue = (value: JsonValue): string => {
       if (typeof value === 'string') {
         return `"${value.replace(/"/g, '\\"')}"`;
       } else if (typeof value === 'number' || typeof value === 'boolean') {
@@ -259,11 +272,11 @@ export function AdvancedExporter({ json, filename = 'export' }: AdvancedExporter
       }
     };
 
-    const processObject = (obj: any, prefix = ''): void => {
+    const processObject = (obj: Record<string, JsonValue>, prefix = ''): void => {
       for (const [key, value] of Object.entries(obj)) {
         const fullKey = prefix ? `${prefix}.${key}` : key;
         
-        if (value && typeof value === 'object' && !Array.isArray(value)) {
+        if (isJsonObject(value)) {
           if (opts.tomlArrayOfTables && Array.isArray(Object.values(value)[0])) {
             lines.push(`\n[[${fullKey}]]`);
             processObject(value, '');
@@ -277,19 +290,28 @@ export function AdvancedExporter({ json, filename = 'export' }: AdvancedExporter
       }
     };
 
-    processObject(data);
+    if (isJsonObject(data)) {
+      processObject(data);
+    } else {
+      lines.push(`value = ${convertValue(data)}`);
+    }
     return lines.join('\n').trim();
   };
 
   // Properties converter
-  const convertToProperties = (data: any, prefix = ''): string => {
+  const convertToProperties = (data: JsonValue, prefix = ''): string => {
     const lines: string[] = [];
     
-    const flatten = (obj: any, currentPrefix = ''): void => {
+    const flatten = (obj: JsonValue, currentPrefix = ''): void => {
+      if (!isJsonObject(obj)) {
+        lines.push(`${currentPrefix || 'value'}=${Array.isArray(obj) ? obj.map(String).join(',') : String(obj)}`);
+        return;
+      }
+
       for (const [key, value] of Object.entries(obj)) {
         const fullKey = currentPrefix ? `${currentPrefix}.${key}` : key;
         
-        if (value && typeof value === 'object' && !Array.isArray(value)) {
+        if (isJsonObject(value)) {
           flatten(value, fullKey);
         } else {
           const stringValue = Array.isArray(value) ? value.join(',') : String(value);
@@ -303,14 +325,19 @@ export function AdvancedExporter({ json, filename = 'export' }: AdvancedExporter
   };
 
   // Environment variables converter
-  const convertToEnv = (data: any, prefix = ''): string => {
+  const convertToEnv = (data: JsonValue, prefix = ''): string => {
     const lines: string[] = [];
     
-    const flatten = (obj: any, currentPrefix = ''): void => {
+    const flatten = (obj: JsonValue, currentPrefix = ''): void => {
+      if (!isJsonObject(obj)) {
+        lines.push(`${(currentPrefix || 'VALUE').toUpperCase()}="${Array.isArray(obj) ? obj.map(String).join(',') : String(obj)}"`);
+        return;
+      }
+
       for (const [key, value] of Object.entries(obj)) {
         const envKey = (currentPrefix ? `${currentPrefix}_${key}` : key).toUpperCase();
         
-        if (value && typeof value === 'object' && !Array.isArray(value)) {
+        if (isJsonObject(value)) {
           flatten(value, envKey);
         } else {
           const stringValue = Array.isArray(value) ? value.join(',') : String(value);

@@ -1,0 +1,30 @@
+name: Feature request
+description: Suggest an improvement to an existing StableJSON workflow.
+title: "Feature: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What workflow is difficult, slow, or unclear today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior you want to see.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What workarounds or other designs did you consider?
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples
+      description: Add links, screenshots, or sample JSON if they help explain the request.

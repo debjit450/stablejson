@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useTheme } from "@/hooks/useTheme";
 import { useKeyboardNavigation, DEFAULT_JSON_SHORTCUTS } from "@/lib/keyboardNavigation";
-import { PerformanceMonitor, MemoryEfficientJson, debounce } from "@/lib/performance";
+import { PerformanceMonitor, MemoryEfficientJson, debounce, PerformanceMetrics } from "@/lib/performance";
 import {
   validateJson,
   formatJson,
@@ -82,7 +82,7 @@ export default function Index() {
   const [structuralDiff, setStructuralDiff] = useLocalStorage("stablejson-structural-diff", false);
   const [commandOpen, setCommandOpen] = useState(false);
   const [performanceMode, setPerformanceMode] = useLocalStorage("stablejson-performance", false);
-  const [processingStats, setProcessingStats] = useState<any>(null);
+  const [processingStats, setProcessingStats] = useState<PerformanceMetrics | null>(null);
   const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
 

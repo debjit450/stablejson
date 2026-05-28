@@ -1,0 +1,56 @@
+name: Bug report
+description: Report a reproducible problem in StableJSON.
+title: "Bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Do not include private or sensitive JSON payloads.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest set of steps that reproduces the issue.
+      placeholder: |
+        1. Open ...
+        2. Paste ...
+        3. Click ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      placeholder: Chrome 126, Firefox 127, Safari 17, Edge 126
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: macOS, Windows, Linux, iOS, Android
+  - type: textarea
+    id: sample
+    attributes:
+      label: Minimal sample JSON
+      description: Include only non-sensitive sample data.
+      render: json

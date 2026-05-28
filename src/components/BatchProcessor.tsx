@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { JsonWorker, PerformanceMonitor } from '@/lib/performance';
+import { JsonValue, isJsonObject } from '@/lib/jsonTypes';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
@@ -43,11 +44,46 @@ interface BatchFile {
 
 interface BatchOperation {
   type: 'format' | 'minify' | 'validate' | 'clean' | 'sort' | 'transform';
-  options?: Record<string, any>;
+  options?: Record<string, JsonValue>;
 }
 
 interface BatchProcessorProps {
   onResult?: (results: BatchFile[]) => void;
+}
+
+function removeNullAndEmpty(obj: JsonValue): JsonValue {
+  if (Array.isArray(obj)) {
+    return obj.map(removeNullAndEmpty).filter(item => item !== null && item !== '');
+  }
+
+  if (isJsonObject(obj)) {
+    const cleaned: Record<string, JsonValue> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      const cleanedValue = removeNullAndEmpty(value);
+      if (cleanedValue !== null && cleanedValue !== '') {
+        cleaned[key] = cleanedValue;
+      }
+    }
+    return cleaned;
+  }
+
+  return obj;
+}
+
+function sortObjectKeys(obj: JsonValue): JsonValue {
+  if (Array.isArray(obj)) {
+    return obj.map(sortObjectKeys);
+  }
+
+  if (isJsonObject(obj)) {
+    const sorted: Record<string, JsonValue> = {};
+    Object.keys(obj).sort().forEach(key => {
+      sorted[key] = sortObjectKeys(obj[key]);
+    });
+    return sorted;
+  }
+
+  return obj;
 }
 
 export function BatchProcessor({ onResult }: BatchProcessorProps) {
@@ -122,25 +158,28 @@ export function BatchProcessor({ onResult }: BatchProcessorProps) {
       
       switch (operation.type) {
         case 'format':
-          result = await workerRef.current.processJson('format', file.content);
+          result = await workerRef.current.processJson<string>('format', file.content);
           break;
         case 'minify':
-          result = await workerRef.current.processJson('minify', file.content);
+          result = await workerRef.current.processJson<string>('minify', file.content);
           break;
-        case 'validate':
+        case 'validate': {
           const validation = await workerRef.current.processJson('validate', file.content);
           result = JSON.stringify(validation, null, 2);
           break;
-        case 'clean':
-          const parsed = JSON.parse(file.content);
+        }
+        case 'clean': {
+          const parsed = JSON.parse(file.content) as JsonValue;
           const cleaned = removeNullAndEmpty(parsed);
           result = JSON.stringify(cleaned, null, 2);
           break;
-        case 'sort':
-          const sortedParsed = JSON.parse(file.content);
+        }
+        case 'sort': {
+          const sortedParsed = JSON.parse(file.content) as JsonValue;
           const sorted = sortObjectKeys(sortedParsed);
           result = JSON.stringify(sorted, null, 2);
           break;
+        }
         default:
           throw new Error(`Unknown operation: ${operation.type}`);
       }
@@ -341,36 +380,6 @@ export function BatchProcessor({ onResult }: BatchProcessorProps) {
     avgProcessingTime: files.filter(f => f.processingTime).reduce((sum, f) => sum + f.processingTime!, 0) / Math.max(1, files.filter(f => f.processingTime).length),
   };
 
-  // Helper functions
-  const removeNullAndEmpty = (obj: any): any => {
-    if (Array.isArray(obj)) {
-      return obj.map(removeNullAndEmpty).filter(item => item !== null && item !== undefined && item !== '');
-    } else if (obj !== null && typeof obj === 'object') {
-      const cleaned: any = {};
-      for (const [key, value] of Object.entries(obj)) {
-        const cleanedValue = removeNullAndEmpty(value);
-        if (cleanedValue !== null && cleanedValue !== undefined && cleanedValue !== '') {
-          cleaned[key] = cleanedValue;
-        }
-      }
-      return cleaned;
-    }
-    return obj;
-  };
-
-  const sortObjectKeys = (obj: any): any => {
-    if (Array.isArray(obj)) {
-      return obj.map(sortObjectKeys);
-    } else if (obj !== null && typeof obj === 'object') {
-      const sorted: any = {};
-      Object.keys(obj).sort().forEach(key => {
-        sorted[key] = sortObjectKeys(obj[key]);
-      });
-      return sorted;
-    }
-    return obj;
-  };
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
@@ -436,7 +445,7 @@ export function BatchProcessor({ onResult }: BatchProcessorProps) {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <Label htmlFor="operation">Operation</Label>
-            <Select value={operation.type} onValueChange={(value) => setOperation({ type: value as any })}>
+            <Select value={operation.type} onValueChange={(value) => setOperation({ type: value as BatchOperation['type'] })}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

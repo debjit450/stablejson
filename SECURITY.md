@@ -2,103 +2,52 @@
 
 ## Supported Versions
 
-We actively support the following versions of StableJSON with security updates:
+StableJSON supports the current released version with security fixes.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+| Version | Supported |
+| --- | --- |
+| 1.5.x | Yes |
+| < 1.5 | No |
 
 ## Reporting a Vulnerability
 
-We take the security of StableJSON seriously. If you believe you have found a security vulnerability, please report it to us as described below.
+Do not report security vulnerabilities through public GitHub issues.
 
-### How to Report
+Use GitHub Security Advisories for private disclosure:
 
-**Please do NOT report security vulnerabilities through public GitHub issues.**
+https://github.com/debjit450/stablejson/security/advisories/new
 
-Instead, please report them via email to: **security@stablejson.com**
+If GitHub Security Advisories are unavailable, contact the maintainer listed in the README.
 
-Include the following information in your report:
-- Type of issue (e.g. buffer overflow, SQL injection, cross-site scripting, etc.)
-- Full paths of source file(s) related to the manifestation of the issue
-- The location of the affected source code (tag/branch/commit or direct URL)
-- Any special configuration required to reproduce the issue
-- Step-by-step instructions to reproduce the issue
-- Proof-of-concept or exploit code (if possible)
-- Impact of the issue, including how an attacker might exploit the issue
+## What to Include
 
-### What to Expect
+Please include:
 
-- **Acknowledgment**: We will acknowledge receipt of your vulnerability report within 48 hours.
-- **Initial Assessment**: We will provide an initial assessment within 5 business days.
-- **Regular Updates**: We will keep you informed of our progress throughout the process.
-- **Resolution**: We aim to resolve critical vulnerabilities within 30 days.
+- Affected version, branch, or commit.
+- Browser and operating system details.
+- Reproduction steps.
+- Minimal proof of concept when available.
+- Impact assessment.
+- Whether the issue involves browser storage, generated files, workers, dependency behavior, routing, or exported content.
 
-### Responsible Disclosure
+Do not include real secrets, credentials, production customer data, or private JSON payloads.
 
-We kindly ask that you:
-- Give us reasonable time to investigate and fix the issue before public disclosure
-- Avoid accessing, modifying, or deleting data that doesn't belong to you
-- Don't perform actions that could harm the reliability or integrity of our services
-- Don't use social engineering, physical, or electronic attacks against our employees, users, or infrastructure
+## Disclosure Expectations
 
-### Recognition
+Please allow maintainers reasonable time to triage and fix the issue before public disclosure. Avoid actions that access, modify, delete, or exfiltrate data that does not belong to you.
 
-We believe in recognizing security researchers who help keep our users safe. With your permission, we will:
-- Publicly acknowledge your responsible disclosure
-- Include your name in our security acknowledgments (unless you prefer to remain anonymous)
+## Project Security Model
 
-## Security Measures
+StableJSON is a static frontend application:
 
-### Client-Side Security
-StableJSON is designed with security in mind:
+- JSON processing happens in the browser.
+- The app does not require an application backend to process JSON.
+- Editor content and preferences may be stored in local browser storage.
+- File import and export use browser APIs.
+- CI enforces linting, TypeScript checks, production builds, and moderate-or-higher production dependency audits.
 
-- **No Server Communication**: All processing happens locally in your browser
-- **No Data Storage**: We don't store or transmit any of your JSON data
-- **Content Security Policy**: Implemented to prevent XSS attacks
-- **Dependency Management**: Regular updates and security audits of dependencies
+## User Guidance
 
-### Browser Security
-- **HTTPS Only**: All web traffic is encrypted
-- **Secure Headers**: Proper security headers are implemented
-- **No External Resources**: Minimal external dependencies reduce attack surface
-
-### Development Security
-- **Code Review**: All code changes are reviewed before merging
-- **Automated Scanning**: Dependencies are automatically scanned for vulnerabilities
-- **Secure Development**: Following secure coding practices
-
-## Security Best Practices for Users
-
-### General Usage
-- **Keep Browser Updated**: Use the latest version of your web browser
-- **Trusted Networks**: Use StableJSON on trusted networks when possible
-- **Sensitive Data**: Be cautious when processing highly sensitive JSON data
-
-### Data Privacy
-- **Local Processing**: Remember that all processing happens locally
-- **Browser Storage**: Clear browser storage if using on shared computers
-- **No Persistence**: Use incognito/private mode for extra privacy
-
-## Vulnerability Disclosure Timeline
-
-1. **Day 0**: Vulnerability reported
-2. **Day 1-2**: Acknowledgment sent to reporter
-3. **Day 3-7**: Initial assessment and triage
-4. **Day 8-30**: Investigation and fix development
-5. **Day 31**: Public disclosure (if resolved) or status update
-
-## Contact Information
-
-- **Security Email**: security@stablejson.com
-- **General Contact**: hello@stablejson.com
-- **GitHub Issues**: For non-security related issues only
-
-## Legal
-
-This security policy is subject to our [Terms of Service](https://stablejson.com/terms) and [Privacy Policy](https://stablejson.com/privacy).
-
----
-
-Thank you for helping keep StableJSON and our users safe!
+- Avoid pasting sensitive JSON into shared machines or untrusted browser sessions.
+- Clear browser storage after sensitive work on shared devices.
+- Share only minimized, non-sensitive sample payloads in public issues.

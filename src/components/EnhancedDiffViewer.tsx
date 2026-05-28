@@ -12,7 +12,6 @@ import {
   Plus,
   Minus,
   Edit,
-  Move,
   Eye,
   EyeOff,
   Filter,
@@ -37,14 +36,13 @@ interface EnhancedDiffViewerProps {
 }
 
 type DiffViewMode = 'side-by-side' | 'unified' | 'inline' | 'stats';
-type DiffFilterType = 'all' | 'added' | 'removed' | 'modified' | 'moved';
+type DiffFilterType = 'all' | 'added' | 'removed' | 'changed';
 
 interface DiffStats {
   total: number;
   added: number;
   removed: number;
-  modified: number;
-  moved: number;
+  changed: number;
   unchanged: number;
 }
 
@@ -70,8 +68,7 @@ export function EnhancedDiffViewer({
       total: diffs.length,
       added: 0,
       removed: 0,
-      modified: 0,
-      moved: 0,
+      changed: 0,
       unchanged: 0,
     };
 
@@ -83,11 +80,8 @@ export function EnhancedDiffViewer({
         case 'removed':
           result.removed++;
           break;
-        case 'modified':
-          result.modified++;
-          break;
-        case 'moved':
-          result.moved++;
+        case 'changed':
+          result.changed++;
           break;
         default:
           result.unchanged++;
@@ -106,10 +100,8 @@ export function EnhancedDiffViewer({
           return diff.type === 'added';
         case 'removed':
           return diff.type === 'removed';
-        case 'modified':
-          return diff.type === 'modified';
-        case 'moved':
-          return diff.type === 'moved';
+        case 'changed':
+          return diff.type === 'changed';
         default:
           return true;
       }
@@ -139,10 +131,23 @@ export function EnhancedDiffViewer({
     setExpandedPaths(newExpanded);
   };
 
+  const getDiffMessage = (diff: DiffResult) => {
+    switch (diff.type) {
+      case 'added':
+        return `Value added at ${diff.path}`;
+      case 'removed':
+        return `Value removed from ${diff.path}`;
+      case 'changed':
+        return `Value changed at ${diff.path}`;
+      default:
+        return `No value change at ${diff.path}`;
+    }
+  };
+
   const handleCopyDiff = async () => {
     try {
       const diffText = filteredDiffs
-        .map((diff) => `${diff.type.toUpperCase()}: ${diff.path}\n${diff.message}`)
+        .map((diff) => `${diff.type.toUpperCase()}: ${diff.path}\n${getDiffMessage(diff)}`)
         .join('\n\n');
       
       await navigator.clipboard.writeText(diffText);
@@ -185,10 +190,8 @@ export function EnhancedDiffViewer({
         return <Plus className="w-4 h-4 text-green-500" />;
       case 'removed':
         return <Minus className="w-4 h-4 text-red-500" />;
-      case 'modified':
+      case 'changed':
         return <Edit className="w-4 h-4 text-blue-500" />;
-      case 'moved':
-        return <Move className="w-4 h-4 text-purple-500" />;
       default:
         return <GitCompare className="w-4 h-4 text-muted-foreground" />;
     }
@@ -200,10 +203,8 @@ export function EnhancedDiffViewer({
         return 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800';
       case 'removed':
         return 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800';
-      case 'modified':
+      case 'changed':
         return 'bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800';
-      case 'moved':
-        return 'bg-purple-50 border-purple-200 dark:bg-purple-950 dark:border-purple-800';
       default:
         return 'bg-muted/50 border-border';
     }
@@ -245,14 +246,8 @@ export function EnhancedDiffViewer({
               </Badge>
               <Badge variant="outline" className="text-blue-600 border-blue-200">
                 <Edit className="w-3 h-3 mr-1" />
-                {stats.modified}
+                {stats.changed}
               </Badge>
-              {stats.moved > 0 && (
-                <Badge variant="outline" className="text-purple-600 border-purple-200">
-                  <Move className="w-3 h-3 mr-1" />
-                  {stats.moved}
-                </Badge>
-              )}
             </div>
           </div>
           
@@ -324,8 +319,7 @@ export function EnhancedDiffViewer({
               <option value="all">All changes</option>
               <option value="added">Added only</option>
               <option value="removed">Removed only</option>
-              <option value="modified">Modified only</option>
-              <option value="moved">Moved only</option>
+              <option value="changed">Changed only</option>
             </select>
           </div>
         </div>
@@ -383,7 +377,7 @@ export function EnhancedDiffViewer({
                       </div>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <p className="text-sm text-muted-foreground mb-2">{diff.message}</p>
+                      <p className="text-sm text-muted-foreground mb-2">{getDiffMessage(diff)}</p>
                       {expandedPaths.has(diff.path) && (
                         <div className="grid grid-cols-2 gap-4 mt-4">
                           <div>
@@ -429,7 +423,7 @@ export function EnhancedDiffViewer({
                     )}
                     {getDiffIcon(diff.type)}
                     <code className="text-xs font-mono flex-1">{diff.path}</code>
-                    <span className="text-xs text-muted-foreground">{diff.message}</span>
+                    <span className="text-xs text-muted-foreground">{getDiffMessage(diff)}</span>
                   </div>
                 ))}
               </div>
@@ -464,12 +458,8 @@ export function EnhancedDiffViewer({
                       </div>
                       <div className="space-y-2">
                         <div className="flex justify-between text-blue-600">
-                          <span className="text-sm">Modified:</span>
-                          <span className="font-mono">{stats.modified}</span>
-                        </div>
-                        <div className="flex justify-between text-purple-600">
-                          <span className="text-sm">Moved:</span>
-                          <span className="font-mono">{stats.moved}</span>
+                          <span className="text-sm">Changed:</span>
+                          <span className="font-mono">{stats.changed}</span>
                         </div>
                         <div className="flex justify-between text-muted-foreground">
                           <span className="text-sm">Unchanged:</span>
@@ -486,8 +476,7 @@ export function EnhancedDiffViewer({
                         {[
                           { label: 'Added', count: stats.added, color: 'bg-green-500' },
                           { label: 'Removed', count: stats.removed, color: 'bg-red-500' },
-                          { label: 'Modified', count: stats.modified, color: 'bg-blue-500' },
-                          { label: 'Moved', count: stats.moved, color: 'bg-purple-500' },
+                          { label: 'Changed', count: stats.changed, color: 'bg-blue-500' },
                         ].map(({ label, count, color }) => (
                           <div key={label} className="flex items-center gap-2">
                             <div className={`w-3 h-3 rounded ${color}`} />

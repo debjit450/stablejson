@@ -1,307 +1,92 @@
-# Contributing to StableJSON
+# Contributing
 
-Thank you for your interest in contributing to StableJSON! We welcome contributions from the community and are excited to see what you'll bring to the project.
+Thank you for contributing to StableJSON. The project values small, focused changes that improve correctness, usability, performance, privacy, or maintainability.
 
-## 🚀 Quick Start
+## Ground Rules
 
-1. **Fork the repository** on GitHub
-2. **Clone your fork:**
-   ```bash
-   git clone https://github.com/debjit450/stablejson.git
-   cd stablejson
-   ```
-3. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-4. **Start development server:**
-   ```bash
-   npm run dev
-   ```
+- Keep pull requests narrow and reviewable.
+- Match existing patterns before introducing new abstractions.
+- Avoid new dependencies unless they clearly reduce project complexity.
+- Keep JSON output deterministic for identical input.
+- Do not add analytics, telemetry, or server-side JSON processing without a clear maintainer decision.
+- Do not include private or sensitive JSON payloads in issues, tests, screenshots, or pull requests.
 
-## 🛠️ Development Workflow
+## Setup
 
-### Making Changes
-
-1. **Create a feature branch:**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-2. **Make your changes** following our coding standards
-
-3. **Test your changes:**
-   ```bash
-   npm run lint
-   npm run build
-   ```
-
-4. **Commit with clear messages:**
-   ```bash
-   git commit -m "feat: add new JSON validation feature"
-   ```
-
-5. **Push and create a pull request:**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-
-### Commit Message Convention
-
-We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
-
-- `feat:` - New features
-- `fix:` - Bug fixes
-- `docs:` - Documentation changes
-- `style:` - Code style changes (formatting, etc.)
-- `refactor:` - Code refactoring
-- `test:` - Adding or updating tests
-- `chore:` - Maintenance tasks
-
-Examples:
-```
-feat: add JSONPath query support
-fix: resolve memory leak in large JSON processing
-docs: update installation instructions
-style: format code with prettier
-refactor: simplify JSON validation logic
-test: add unit tests for diff functionality
-chore: update dependencies
+```bash
+git clone https://github.com/debjit450/stablejson.git
+cd stablejson
+npm ci
+npm run dev
 ```
 
-## 📋 Coding Standards
+Use Node.js 20 or newer.
 
-### TypeScript
-- Use TypeScript for all new code
-- Provide proper type definitions
-- Avoid `any` types when possible
-- Use interfaces for object shapes
+## Development Workflow
 
-### Code Style
-- Follow the existing ESLint configuration
-- Use Prettier for consistent formatting
-- Use meaningful variable and function names
-- Add JSDoc comments for complex functions
+1. Create a branch from the default branch.
+2. Make a focused change.
+3. Run the local quality gate.
+4. Open a pull request with a clear summary and validation notes.
 
-### Component Structure
-```typescript
-// Good component structure
-interface ComponentProps {
-  data: JsonData;
-  onUpdate: (data: JsonData) => void;
-}
-
-export function Component({ data, onUpdate }: ComponentProps) {
-  // Component logic
-  return (
-    <div className="component-container">
-      {/* Component JSX */}
-    </div>
-  );
-}
+```bash
+npm run validate
 ```
 
-### File Organization
-```
-src/
-├── components/          # Reusable UI components
-│   ├── ui/             # shadcn/ui components
-│   └── [Component].tsx # Feature components
-├── hooks/              # Custom React hooks
-├── lib/                # Utility functions
-├── pages/              # Page components
-└── types/              # TypeScript type definitions
-```
+## Commit Messages
 
-## 🎨 Design Guidelines
+Use concise, conventional prefixes where practical:
 
-### UI/UX Principles
-- **Simplicity First** - Keep interfaces clean and uncluttered
-- **Accessibility** - Ensure all features are accessible (WCAG 2.1 AA)
-- **Responsive Design** - Support desktop, tablet, and mobile
-- **Performance** - Optimize for fast loading and smooth interactions
+- `feat:` for user-facing features
+- `fix:` for bug fixes
+- `docs:` for documentation
+- `refactor:` for internal code changes
+- `test:` for tests
+- `chore:` for maintenance
 
-### Design System
-- Use Tailwind CSS classes consistently
-- Follow the established color palette
-- Use Geist and Inter fonts
-- Maintain consistent spacing (4px grid system)
+Example:
 
-### Component Guidelines
-- Use shadcn/ui components as base
-- Implement proper focus states
-- Add loading states for async operations
-- Include error handling and user feedback
-
-## 🧪 Testing
-
-### Manual Testing
-- Test on different browsers (Chrome, Firefox, Safari, Edge)
-- Verify responsive design on various screen sizes
-- Test with large JSON files (>1MB)
-- Validate accessibility with screen readers
-
-### Automated Testing (Future)
-We're planning to add:
-- Unit tests with Jest
-- Component tests with React Testing Library
-- E2E tests with Playwright
-
-## 📚 Documentation
-
-### Code Documentation
-- Add JSDoc comments for public APIs
-- Document complex algorithms
-- Include usage examples
-- Update README for new features
-
-### User Documentation
-- Update feature descriptions
-- Add screenshots for new UI elements
-- Create usage examples
-- Update keyboard shortcuts
-
-## 🐛 Bug Reports
-
-### Before Reporting
-1. Check existing issues to avoid duplicates
-2. Test with the latest version
-3. Try to reproduce the issue consistently
-
-### Bug Report Template
-```markdown
-**Describe the bug**
-A clear description of what the bug is.
-
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
-
-**Expected behavior**
-A clear description of what you expected to happen.
-
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
-**Environment:**
-- Browser: [e.g. Chrome 91]
-- OS: [e.g. macOS 12.0]
-- Version: [e.g. 1.0.0]
-
-**Sample JSON**
-If applicable, provide the JSON that caused the issue.
+```text
+fix: preserve array values during JSON cleanup
 ```
 
-## ✨ Feature Requests
+## Code Guidelines
 
-### Before Requesting
-1. Check if the feature already exists
-2. Search existing feature requests
-3. Consider if it fits the project's philosophy
+- Use TypeScript for application code.
+- Prefer explicit data shapes for JSON utilities.
+- Keep UI state close to the component that owns it.
+- Use shared UI primitives from `src/components/ui` where possible.
+- Handle invalid JSON with user-facing errors.
+- Keep browser-only behavior guarded when necessary.
+- Document non-obvious behavior in code or docs.
 
-### Feature Request Template
-```markdown
-**Is your feature request related to a problem?**
-A clear description of what the problem is.
+## Documentation Guidelines
 
-**Describe the solution you'd like**
-A clear description of what you want to happen.
+Update documentation when a change affects:
 
-**Describe alternatives you've considered**
-Alternative solutions or features you've considered.
+- User workflows
+- Public project setup
+- CI or deployment behavior
+- Privacy or security expectations
+- Supported commands
 
-**Use case**
-Describe how this feature would be used.
+Maintained documentation lives in `docs/`.
 
-**Additional context**
-Add any other context or screenshots about the feature request.
-```
+## Pull Request Checklist
 
-## 🎯 Areas for Contribution
+- `npm run lint` passes.
+- `npm run typecheck` passes.
+- `npm run build` passes.
+- The change is documented where needed.
+- UI changes include screenshots or a short recording.
+- Security and privacy implications are described when relevant.
 
-### High Priority
-- 🐛 **Bug Fixes** - Help us squash bugs and improve stability
-- 📱 **Mobile Experience** - Improve mobile usability
-- ♿ **Accessibility** - Enhance accessibility features
-- 🚀 **Performance** - Optimize for large JSON files
+## Reporting Issues
 
-### Medium Priority
-- ✨ **New Features** - Add new JSON processing capabilities
-- 🎨 **UI/UX Improvements** - Enhance visual design and user experience
-- 📚 **Documentation** - Improve docs, examples, and tutorials
-- 🌐 **Internationalization** - Add support for more languages
+Use the GitHub issue templates for bugs and feature requests. Include a minimal reproduction and sample JSON only when it is safe to share.
 
-### Low Priority
-- 🧪 **Testing** - Add automated tests
-- 🔧 **Developer Tools** - Improve development experience
-- 📦 **Build Process** - Optimize build and deployment
+Security vulnerabilities must be reported privately through GitHub Security Advisories or the process in `SECURITY.md`.
 
-## 🔍 Code Review Process
+## Code of Conduct
 
-### Pull Request Guidelines
-1. **Clear Description** - Explain what changes you made and why
-2. **Small Changes** - Keep PRs focused and manageable
-3. **Tests** - Include tests for new features (when testing is available)
-4. **Documentation** - Update docs for user-facing changes
-
-### Review Criteria
-- Code quality and maintainability
-- Adherence to coding standards
-- Performance impact
-- Accessibility compliance
-- User experience considerations
-
-### Review Process
-1. Automated checks (linting, building)
-2. Manual code review by maintainers
-3. Testing on different browsers/devices
-4. Feedback and iteration
-5. Approval and merge
-
-## 🏆 Recognition
-
-### Contributors
-All contributors will be:
-- Listed in the project's contributors section
-- Mentioned in release notes for significant contributions
-- Invited to join the project's Discord community (when available)
-
-### Maintainers
-Active contributors may be invited to become maintainers with:
-- Commit access to the repository
-- Ability to review and merge pull requests
-- Input on project direction and roadmap
-
-## 📞 Getting Help
-
-### Community Support
-- **GitHub Issues** - For bugs and feature requests
-- **GitHub Discussions** - For questions and community chat
-- **Documentation** - Check the README and docs first
-
-### Direct Contact
-- **Email** - contribute@stablejson.com
-- **Twitter** - @stablejson (when available)
-
-## 📜 Code of Conduct
-
-### Our Pledge
-We are committed to making participation in our project a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, nationality, personal appearance, race, religion, or sexual identity and orientation.
-
-### Our Standards
-Examples of behavior that contributes to creating a positive environment include:
-- Using welcoming and inclusive language
-- Being respectful of differing viewpoints and experiences
-- Gracefully accepting constructive criticism
-- Focusing on what is best for the community
-- Showing empathy towards other community members
-
-### Enforcement
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at conduct@stablejson.com.
-
----
-
-Thank you for contributing to StableJSON! Together, we're building a tool that makes JSON processing simple, fast, and enjoyable for developers worldwide. 🚀
+All contributors are expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
