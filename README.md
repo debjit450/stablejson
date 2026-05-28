@@ -6,9 +6,9 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-5-646cff.svg)](https://vite.dev/)
 
-StableJSON is a privacy-first JSON workspace for developers. It validates, formats, compares, queries, transforms, exports, and documents JSON directly in the browser.
+StableJSON is a browser-based JSON workspace for developers. It validates, formats, compares, queries, transforms, exports, and documents JSON in a focused web interface.
 
-The application is frontend-only. JSON payloads are processed locally in the user's browser and are not sent to a server by the app.
+The application is a static frontend built with React, TypeScript, Vite, and Tailwind CSS.
 
 ## Features
 
@@ -83,7 +83,7 @@ Dependabot is configured for npm packages and GitHub Actions.
 - [Development Guide](docs/development.md)
 - [Architecture](docs/architecture.md)
 - [Deployment](docs/deployment.md)
-- [Privacy and Security](docs/privacy-and-security.md)
+- [Security Notes](docs/privacy-and-security.md)
 
 ## Project Structure
 
@@ -97,18 +97,6 @@ public/              Static deployment assets
 .github/             CI, Dependabot, and issue templates
 docs/                Project documentation
 ```
-
-## Privacy
-
-StableJSON is designed for local processing:
-
-- JSON input is parsed and transformed in the browser.
-- No account is required.
-- The app does not need an application backend for JSON processing.
-- Editor content and preferences may be stored in local browser storage.
-- Users should avoid pasting sensitive data into shared machines or untrusted browser sessions.
-
-See [Privacy and Security](docs/privacy-and-security.md) for more detail.
 
 ## Security
 
